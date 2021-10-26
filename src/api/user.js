@@ -6,19 +6,17 @@ import { doGet, doPost, doPut, doDelete } from 'utils/request';
  * @returns {Promise<AxiosResponse<*>>}
  */
 function doLogin(data) {
-  return doPost(`/api/doLogin`, data);
+  return doPost(`/api/auth/token`, data);
 }
 
 /**
- * 校验Token
- * @param data
- * @returns {*}
+ * 加载菜单路由信息
+ * @returns {Promise<AxiosResponse<*>>}
  */
-function checkToken(data) {
-  return doPost(`/api/checkToken`, data);
+function loadMenu() {
+  return doPost(`/api/auth/tqAuthResource/loadMenu`);
 }
-
 export default {
   doLogin,
-  checkToken,
+  loadMenu,
 };

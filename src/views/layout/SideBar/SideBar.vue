@@ -18,50 +18,15 @@
         background-color="#303133"
         text-color="#fff"
         active-text-color="#ffd04b"
-        :default-active="currentMenuItem.index"
+        :default-active="
+          currentMenuItem.index ? currentMenuItem.index.toString() : '1'
+        "
       >
-        <el-sub-menu index="1">
-          <template #title>
-            <i class="el-icon-location"></i>
-            <span>导航一</span>
-          </template>
-          <el-menu-item-group>
-            <template #title>分组一</template>
-            <el-menu-item
-              index="2"
-              @click="clickItem('选项2', '/demo2', true, 2)"
-              >选项2</el-menu-item
-            >
-            <el-menu-item
-              index="3"
-              @click="clickItem('选项1', '/demo', true, 3)"
-              >选项3</el-menu-item
-            >
-          </el-menu-item-group>
-          <el-menu-item-group title="分组2">
-            <el-menu-item index="1-3">选项3</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="4">
-            <template #title>选项4</template>
-            <el-menu-item
-              @click="clickItem('选项3', '/demo2/demo3', true, 4)"
-              index="1-4-1"
-              >选项1</el-menu-item
-            >
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-menu-item index="6">
-          <i class="el-icon-menu"></i>
-          <template #title>导航二</template>
-        </el-menu-item>
-        <el-menu-item index="7" disabled>
-          <i class="el-icon-document"></i>
-          <template #title>导航三</template>
-        </el-menu-item>
-        <el-menu-item index="8">
-          <i class="el-icon-setting"></i>
-          <template #title>导航四</template>
-        </el-menu-item>
+        <side-bar-item
+          v-for="menu in menus"
+          :menu="menu"
+          :key="menu.id"
+        ></side-bar-item>
       </el-menu>
     </el-scrollbar>
   </div>
@@ -70,13 +35,13 @@
 <script setup>
 import { useStore } from 'vuex';
 import { computed } from 'vue';
+import SideBarItem from './SideBarItem.vue';
 
 const store = useStore();
 const showSideBar = computed(() => store.getters['app/showSideBar']);
 const currentMenuItem = computed(() => store.getters['app/currentOpenTag']);
-function clickItem(title, url, closable, index) {
-  store.commit('app/ADD_TAG', { name: title, url, closable, index });
-}
+console.log(currentMenuItem);
+const menus = store.getters['user/userInfo'].menus;
 </script>
 
 <style lang="scss" scoped>

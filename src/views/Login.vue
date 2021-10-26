@@ -23,11 +23,19 @@
             </el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="formData.type" placeholder="账户类型">
+            <el-select v-model="formData.tenantId" placeholder="租户">
               <el-option label="普通用户" value="0"></el-option>
               <el-option label="超级用户" value="1"></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item>
+            <el-select v-model="formData.appKey" placeholder="应用">
+              <el-option label="普通用户" value="0"></el-option>
+              <el-option
+                label="超级应用"
+                value="XQI7tnRpyFddsNNfO"
+              ></el-option></el-select
+          ></el-form-item>
           <el-form-item>
             <el-button class="loginBtn" type="primary" @click="onSubmit"
               >登录</el-button
@@ -44,7 +52,12 @@ import { reactive } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const formData = reactive({ username: '', password: '', type: '' });
+const formData = reactive({
+  username: '',
+  password: '',
+  appKey: '',
+  tenantId: '',
+});
 
 function onSubmit() {
   store.dispatch('user/DO_LOGIN', formData);

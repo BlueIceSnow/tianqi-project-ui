@@ -29,5 +29,6 @@ module.exports = {
     'no-use-before-define': 'off',
     'for-direction': 'off',
     'no-plusplus': 'off',
+    'vue/valid-template-root': 'off',
   },
 };

@@ -45,7 +45,6 @@ const showMenu = ref(false);
 watch(
   () => store.getters['app/currentOpenTag'],
   (newVal) => {
-    console.log(newVal);
     if (!newVal || newVal.url === '') {
       router.push('/');
       return;

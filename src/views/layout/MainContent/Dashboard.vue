@@ -1,7 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%; background-color: blue; color: white">
-    dashboard
-  </div>
+  <div style="width: 100%; height: 100%">dashboard</div>
 </template>
 
 <script setup>

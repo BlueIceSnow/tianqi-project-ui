@@ -28,12 +28,12 @@
         flex-flow: row-reverse;
       "
     >
-      <el-space wrap size="10">
+      <el-space wrap :size="10">
         <el-dropdown @command="handleCommand">
           <el-avatar
             shape="square"
             :size="40"
-            :fit="fit"
+            fit="fit"
             src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80"
           ></el-avatar>
 
@@ -48,7 +48,7 @@
           </template>
         </el-dropdown></el-space
       >
-      <el-space wrap size="10" v-if="hasFullScreen">
+      <el-space wrap :size="10" v-if="hasFullScreen">
         <el-tooltip
           class="item"
           effect="dark"
@@ -82,6 +82,12 @@ onMounted(() => {
 function changeSideBar() {
   store.dispatch('app/CHANGE_SHOW_SIDE_BAR');
 }
+
+/**
+ * 处理下拉菜单点击事件
+ * @param command
+ */
+function handleCommand(command) {}
 
 /**
  * 全屏

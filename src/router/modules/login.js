@@ -3,6 +3,7 @@ import NotFound from 'views/layout/MainContent/404.vue';
 export default [
   {
     path: '/login',
+    name: 'login',
     component: () => import('views/Login.vue'),
     meta: {
       url: '/login',
