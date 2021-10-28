@@ -1,4 +1,5 @@
 import userApi from 'api/user';
+import NotFound from 'views/layout/MainContent/404.vue';
 import router from '../../router';
 import constRouterDefine from '../../router/router-component-define';
 
@@ -74,7 +75,7 @@ function buildTree(menuList, routerList, pid) {
         const router = {
           path: menuList[i].url,
           name: menuList[i].name,
-          component: constRouterDefine[menuList[i].component],
+          component: constRouterDefine[menuList[i].component] || NotFound,
           meta: {
             url: menuList[i].url,
             title: menuList[i].name,

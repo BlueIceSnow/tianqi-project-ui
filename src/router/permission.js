@@ -20,7 +20,6 @@ router.beforeEach(async (to, from, next) => {
     for (let i = 0; i < routers.length; i++) {
       router.addRoute('index', routers[i]);
     }
-    console.warn(router.getRoutes());
     if (
       !router.hasRoute(to.name) &&
       findNodeFromTree(result?.menus, to.fullPath, 'child', 'url')

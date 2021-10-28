@@ -23,7 +23,7 @@
         @click="clickItem(menu.name, menu.url, menu.closeable.value, menu.id)"
       >
         <i :class="menu.icon"></i>
-        <template #title>{{ menu.name + menu.url }}</template></el-menu-item
+        <template #title>{{ menu.name }}</template></el-menu-item
       >
       <el-menu-item-group v-else>
         <template #title>{{ menu.name }}</template>

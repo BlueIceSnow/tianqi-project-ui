@@ -56,7 +56,7 @@
           placement="bottom-start"
         >
           <img
-            :src="isFullScreen ? 'cancel-full.png' : 'full.png'"
+            :src="isFullScreen ? '/cancel-full.png' : '/full.png'"
             @click="fullScreen"
             style="width: 40px; height: 40px; border-radius: 10px"
           />
