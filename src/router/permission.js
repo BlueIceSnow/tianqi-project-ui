@@ -8,8 +8,10 @@ NProgress.configure({ showSpinner: false });
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
   // 刷新用户信息
+  let result = null;
   if (to.fullPath !== '/login') {
-    const result = await store.dispatch('user/LOAD_USER_MENU');
+    result = await store.dispatch('user/LOAD_USER_MENU');
+
     if (!result) {
       return next('/login');
     }
@@ -18,10 +20,15 @@ router.beforeEach(async (to, from, next) => {
     for (let i = 0; i < routers.length; i++) {
       router.addRoute('index', routers[i]);
     }
+    console.warn(router.getRoutes());
+    if (
+      !router.hasRoute(to.name) &&
+      findNodeFromTree(result?.menus, to.fullPath, 'child', 'url')
+    ) {
+      return next({ ...to, replace: true });
+    }
   }
-  if (!router.hasRoute(to.name)) {
-    return next({ ...to, replace: true });
-  }
+
   return next();
 });
 
@@ -37,3 +44,15 @@ router.afterEach((to, from) => {
   NProgress.done();
   return false;
 });
+
+function findNodeFromTree(tree, matchVal, childKey, matchKey) {
+  let node = null;
+  for (let i = 0; i < tree.length; i++) {
+    if (tree[i][matchKey] === matchVal) {
+      node = tree[i];
+      break;
+    }
+    node = findNodeFromTree(tree[i][childKey], matchVal, childKey, matchKey);
+  }
+  return node;
+}

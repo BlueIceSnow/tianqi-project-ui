@@ -1,6 +1,6 @@
 import userApi from 'api/user';
 import router from '../../router';
-import constRouterDefine from '../../router/router-define';
+import constRouterDefine from '../../router/router-component-define';
 
 export default {
   namespaced: true,
@@ -69,22 +69,25 @@ function buildTree(menuList, routerList, pid) {
   for (let i = 0; i < menuList.length; i++) {
     if (menuList[i].parentId === pid) {
       rootMenu.push(menuList[i]);
-      const children = [];
-      const router = {
-        path: menuList[i].url,
-        name: menuList[i].name,
-        component: constRouterDefine[menuList[i].component],
-        // component: () => import(`@/views${menuList[i].component}.vue`),
-        meta: {
-          url: menuList[i].url,
-          title: menuList[i].name,
-          index: menuList[i].id,
-          closeable: menuList[i].closeable.value,
-        },
-        children,
-      };
+      let children = [];
+      if (!menuList[i].extField.isGroup) {
+        const router = {
+          path: menuList[i].url,
+          name: menuList[i].name,
+          component: constRouterDefine[menuList[i].component],
+          meta: {
+            url: menuList[i].url,
+            title: menuList[i].name,
+            index: menuList[i].id,
+            closeable: menuList[i].closeable.value,
+          },
+          children,
+        };
+        routerList.push(router);
+      } else {
+        children = routerList;
+      }
       const child = buildTree(menuList, children, menuList[i].id);
-      routerList.push(router);
       menuList[i].child = child;
     }
   }

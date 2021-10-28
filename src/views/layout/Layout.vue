@@ -26,7 +26,7 @@
     >
       <NavBar />
       <LabelBar />
-      <MainContent />
+      <MainContent v-if="isShow" />
     </div>
   </div>
 </template>
@@ -36,10 +36,21 @@ import LabelBar from 'views/layout/LabelBar/LabelBar.vue';
 import MainContent from 'views/layout/MainContent/MainContent.vue';
 import NavBar from 'views/layout/NavBar/NavBar.vue';
 import SideBar from 'views/layout/SideBar/SideBar.vue';
-import { computed, onMounted, ref, toRef } from 'vue';
+import { computed, onMounted, ref, toRef, provide, nextTick } from 'vue';
 import { useStore } from 'vuex';
 
+const isShow = ref(true);
+
+provide('reload', reload);
+function reload() {
+  isShow.value = false;
+  nextTick(() => {
+    isShow.value = true;
+  });
+}
+
 const store = useStore();
+const isPc = computed(() => store.getters['app/size'] === 'pc');
 
 const showSideBar = computed(() => {
   if (!isPc.value) {
@@ -52,8 +63,8 @@ const showSideBar = computed(() => {
   }
   return store.getters['app/showSideBar'];
 });
-const isPc = computed(() => store.getters['app/size'] === 'pc');
-const closeFn = () => {
+
+const closeFn = (e) => {
   store.dispatch('app/CHANGE_SHOW_SIDE_BAR');
 };
 </script>

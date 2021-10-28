@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, watch, onMounted } from 'vue';
+import { ref, getCurrentInstance, watch, onMounted, inject } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 
@@ -41,6 +41,7 @@ const app = getCurrentInstance();
 const tags = store.getters['app/tags'];
 
 const showMenu = ref(false);
+const reload = inject('reload');
 
 watch(
   () => store.getters['app/currentOpenTag'],
@@ -134,7 +135,7 @@ function closeTag(tag) {
   }
   const index = tags.findIndex((el) => el.url === tag.url);
   store.commit('app/REMOVE_TAG', tag);
-  if (!tags[index].isActive) {
+  if (!tags[index - 1].isActive) {
     if (tags.length !== 0) {
       if (index === 0) {
         openTag(tags[index]);
@@ -151,6 +152,7 @@ function closeTag(tag) {
  * 刷新标签
  */
 function refreshTag() {
+  reload();
   closeMenu();
 }
 

@@ -1,8 +1,5 @@
 import Layout from 'views/layout/Layout.vue';
-import Demo from 'views/layout/MainContent/Demo1.vue';
-import Demo2 from 'views/layout/MainContent/Demo2.vue';
-import Demo3 from 'views/layout/MainContent/Demo3.vue';
-import Dashboard from 'views/layout/MainContent/Dashboard.vue';
+import Dashboard from 'views/Dashboard.vue';
 
 export default [
   {
@@ -23,7 +20,7 @@ export default [
         component: Dashboard,
         meta: {
           url: '/dashboard',
-          index: 5,
+          index: -1,
           title: 'Dashboard',
           closeable: false,
         },

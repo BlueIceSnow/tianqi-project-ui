@@ -40,7 +40,6 @@ import SideBarItem from './SideBarItem.vue';
 const store = useStore();
 const showSideBar = computed(() => store.getters['app/showSideBar']);
 const currentMenuItem = computed(() => store.getters['app/currentOpenTag']);
-console.log(currentMenuItem);
 const menus = store.getters['user/userInfo'].menus;
 </script>
 

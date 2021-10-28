@@ -1,16 +1,40 @@
 <template>
-  <el-sub-menu :index="menu.id.toString()" :key="menu.id">
-    <template #title>
-      <Item :icon="menu.icon" :title="menu.name"></Item>
-    </template>
-    <el-menu-item
-      v-if="menu.child.length === 0"
+  <template v-if="menu.extField.isShow">
+    <el-sub-menu
+      v-if="menu.child.length !== 0 && !menu.extField.isGroup"
       :index="menu.id.toString()"
-      @click="clickItem(menu.name, menu.url, menu.closeable.value, menu.id)"
+      :key="menu.id"
+      @click.stop
+      popper-append-to-body
     >
-      <i :class="menu.icon"></i> {{ menu.name }}</el-menu-item
-    >
-  </el-sub-menu>
+      <template #title>
+        <Item :icon="menu.icon" :title="menu.name"></Item>
+      </template>
+      <side-bar-item
+        v-for="child in menu.child"
+        :menu="child"
+        :key="child.id.toString()"
+      ></side-bar-item>
+    </el-sub-menu>
+    <template v-else>
+      <el-menu-item
+        v-if="!menu.extField.isGroup"
+        :index="menu.id.toString()"
+        @click="clickItem(menu.name, menu.url, menu.closeable.value, menu.id)"
+      >
+        <i :class="menu.icon"></i>
+        <template #title>{{ menu.name + menu.url }}</template></el-menu-item
+      >
+      <el-menu-item-group v-else>
+        <template #title>{{ menu.name }}</template>
+        <side-bar-item
+          v-for="child in menu.child"
+          :menu="child"
+          :key="child.id.toString()"
+        ></side-bar-item>
+      </el-menu-item-group>
+    </template>
+  </template>
 </template>
 
 <script setup>

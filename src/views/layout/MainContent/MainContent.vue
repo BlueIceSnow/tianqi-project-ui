@@ -19,6 +19,7 @@
   padding: 10px;
   position: relative;
   background-color: white;
+  overflow: hidden;
 }
 
 /* fade-transform */

@@ -2,8 +2,8 @@
   "name": "tq-project-ui",
   "version": "0.0.0",
   "scripts": {
-    "serve": "vite preview",
-    "build": "vite build",
+    "serve": "vite preview --host 127.0.0.1 --base ./",
+    "build": "vite build --base ./",
     "lint": "eslint --fix ./src; prettier --write .",
     "dev": "vite"
   },

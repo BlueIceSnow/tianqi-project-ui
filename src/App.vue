@@ -9,16 +9,22 @@
 </template>
 
 <script setup>
+import { ref, nextTick, provide } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 window.addEventListener('resize', () => {
+  changeSize();
+});
+changeSize();
+
+function changeSize() {
   const result = window.matchMedia('(min-width: 480px)').matches;
   const payload = result ? 'pc' : 'mobile';
   if (store.getters['app/size'] !== payload) {
     store.dispatch('app/SET_SIZE', payload);
   }
-});
+}
 </script>
 
 <style lang="scss">
