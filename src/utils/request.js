@@ -96,8 +96,8 @@ export function doPut(uri, params) {
  * @param param
  * @returns {Promise<AxiosResponse<any>>}
  */
-export function doDelete(uri, param) {
-  return request.delete(uri);
+export function doDelete(uri, params) {
+  return request.delete(uri, { params });
 }
 
 export default request;

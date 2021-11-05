@@ -50,8 +50,12 @@ function findNodeFromTree(tree, matchVal, childKey, matchKey) {
     if (tree[i][matchKey] === matchVal) {
       node = tree[i];
       break;
+    } else {
+      node = findNodeFromTree(tree[i][childKey], matchVal, childKey, matchKey);
+      if (node !== null) {
+        break;
+      }
     }
-    node = findNodeFromTree(tree[i][childKey], matchVal, childKey, matchKey);
   }
   return node;
 }

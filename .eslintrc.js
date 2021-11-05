@@ -30,5 +30,7 @@ module.exports = {
     'for-direction': 'off',
     'no-plusplus': 'off',
     'vue/valid-template-root': 'off',
+    'vue/no-v-model-argument': 'off',
+    'no-nested-ternary': 'off',
   },
 };

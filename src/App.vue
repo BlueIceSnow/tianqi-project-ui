@@ -52,12 +52,4 @@ body,
 .fade-leave {
   opacity: 0.2;
 }
-.cover {
-  //width: 100%;
-  //height: 100%;
-  //position: absolute;
-  //left: 0px;
-  //top: 0px;
-  //background-color: white;
-}
 </style>

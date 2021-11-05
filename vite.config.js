@@ -12,11 +12,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      compos: resolve(__dirname, 'src/components'),
+      components: resolve(__dirname, 'src/components'),
       views: resolve(__dirname, 'src/views'),
       utils: resolve(__dirname, 'src/utils'),
       api: resolve(__dirname, 'src/api'),
       styles: resolve(__dirname, 'src/styles'),
+      common: resolve(__dirname, 'src/common'),
     },
   },
   server: {
