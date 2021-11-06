@@ -20,7 +20,7 @@
   position: relative;
   background-color: white;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* fade-transform */

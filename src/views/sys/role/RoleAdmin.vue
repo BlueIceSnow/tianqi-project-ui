@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <tq-tree-table
+  <div class="wrap">
+    <tq-table
       :apis="apis"
       :columns="columns"
       :main-name="mainName"
@@ -11,23 +11,25 @@
       <template #closeable="{ row }">
         <span v-html="row.closeable.value ? '是' : '否'"></span>
       </template>
-    </tq-tree-table>
+    </tq-table>
   </div>
 </template>
+
 <script setup>
 import { reactive, ref } from 'vue';
 import apis from 'api/sys';
-import TqTreeTable from 'components/TqTreeTable.vue';
+import TqTable from 'components/TqTable.vue';
 
-const mainName = ref('接口');
-const condition = reactive({ type: 'U', appId: 1 });
+const mainName = ref('按钮');
+const condition = reactive({ type: 'M', appId: 1 });
 const methods = reactive({
-  list: 'loadMenuByAppId',
+  list: 'loadMenuByPage',
   save: 'saveMenu',
   update: 'updateMenu',
-  remove: 'removeMenu',
-  batchRemove: 'batchRemoveMenu',
+  remove: 'removeMenuByPage',
+  batchRemove: 'batchRemoveMenuByPage',
 });
+const hasPage = ref(false);
 const columns = reactive([
   {
     column: 'id',
@@ -41,6 +43,8 @@ const columns = reactive([
     label: '名称',
     isShow: true,
     isEdit: true,
+    search: true,
+    default: null,
     type: 'input',
   },
   {
@@ -56,10 +60,11 @@ const columns = reactive([
     isShow: true,
     isEdit: true,
     type: 'select',
+    search: true,
     option: {
       methodName: 'loadMenuByAppId',
-      condition: { type: 'U', appId: 1 },
-      default: [{ id: -1, name: '顶级接口' }],
+      condition: { type: 'M', appId: 1 },
+      default: [{ id: -1, name: '顶级按钮' }],
       key: 'name',
       value: 'id',
     },
@@ -69,7 +74,12 @@ const columns = reactive([
     label: `可关闭`,
     isShow: true,
     isEdit: true,
+
     type: 'switch',
+    switch: {
+      on: '可关闭',
+      off: '不可关闭',
+    },
     slot: 'closeable',
   },
   {
@@ -77,10 +87,6 @@ const columns = reactive([
     label: `图标`,
     isShow: true,
     isEdit: false,
-    switch: {
-      on: '可关闭',
-      off: '不可关闭',
-    },
     type: 'switch',
   },
   {
@@ -118,21 +124,17 @@ const columns = reactive([
     label: `外链`,
     isShow: true,
     isEdit: true,
-    switch: {
-      on: '外链',
-      off: '非外联',
-    },
     type: 'switch',
   },
   {
     column: 'extField.isShow',
     label: `展示`,
     isShow: true,
-    isEdit: true,
     switch: {
       on: '展示',
       off: '隐藏',
     },
+    isEdit: true,
     type: 'switch',
   },
   {
@@ -140,10 +142,6 @@ const columns = reactive([
     label: `分组`,
     isShow: true,
     isEdit: true,
-    switch: {
-      on: '分组',
-      off: '非分组',
-    },
     type: 'switch',
   },
 ]);
@@ -165,4 +163,9 @@ const rules = reactive({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+</style>

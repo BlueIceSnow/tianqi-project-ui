@@ -156,11 +156,4 @@ const rules = reactive({
 });
 </script>
 
-<style scoped lang="scss">
-.form-wrap {
-  padding: 10px;
-}
-:deep(.el-drawer__body) {
-  overflow-y: scroll;
-}
-</style>
+<style scoped lang="scss"></style>

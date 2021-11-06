@@ -8,6 +8,7 @@
     </el-button>
   </div>
   <el-table
+    v-loading="loading"
     ref="tableRef"
     :data="componentData.tableData"
     style="width: 100%"
@@ -48,84 +49,78 @@
       </template>
     </el-table-column>
   </el-table>
-  <div
-    style="
-      padding: 10px 10px;
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
+  <el-drawer
+    v-model="componentData.isShow"
+    :title="
+      componentData.isEdit ? `编辑${props.mainName}` : `新增${props.mainName}`
     "
+    size="50%"
+    @close="clearForm"
   >
-    <el-drawer
-      v-model="componentData.isShow"
-      :title="
-        componentData.isEdit ? `编辑${props.mainName}` : `新增${props.mainName}`
-      "
-      size="50%"
-      @close="clearForm"
-    >
-      <div class="form-wrap">
-        <el-form
-          ref="formRef"
-          :model="componentData.ruleForm"
-          :rules="props.rules"
-          label-width="80px"
+    <div class="form-wrap">
+      <el-form
+        ref="formRef"
+        :model="componentData.ruleForm"
+        :rules="props.rules"
+        label-width="80px"
+      >
+        <el-form-item
+          v-for="(column, index) in editColumns"
+          :label="column.label"
+          :prop="column.column"
+          :key="index"
         >
-          <el-form-item
-            v-for="(column, index) in editColumns"
-            :label="column.label"
-            :prop="column.column"
-            :key="index"
-          >
-            <template v-if="column.formSlot">
-              <slot
-                :name="column.formSlot"
-                :column="column"
-                :form="componentData.ruleForm"
-              ></slot>
-            </template>
-            <template v-else>
-              <el-input
-                v-if="column.type === 'input'"
-                v-model="componentData.ruleForm[column.column]"
-              ></el-input>
-              <el-select
-                v-if="column.type === 'select'"
-                v-model="componentData.ruleForm.parentId"
-                :placeholder="column.label"
-              >
-                <el-option
-                  v-for="(option, index) in selectOptions[column.column]"
-                  :key="index"
-                  :label="option[column.option.key]"
-                  :value="option[column.option.value]"
-                />
-              </el-select>
-              <el-switch
-                v-if="column.type === 'switch'"
-                v-model="componentData.ruleForm[column.column]"
-              ></el-switch>
-            </template>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="primary"
-              @click="submitForm()"
-              v-html="componentData.isEdit ? '更新' : '添加'"
-            ></el-button>
-            <el-button @click="resetForm()">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-drawer>
-  </div>
+          <template v-if="column.formSlot">
+            <slot
+              :name="column.formSlot"
+              :column="column"
+              :form="componentData.ruleForm"
+            ></slot>
+          </template>
+          <template v-else>
+            <el-input
+              v-if="column.type === 'input'"
+              v-model="componentData.ruleForm[column.column]"
+            ></el-input>
+            <el-select
+              v-if="column.type === 'select'"
+              v-model="componentData.ruleForm.parentId"
+              :placeholder="column.label"
+            >
+              <el-option
+                v-for="(option, index) in selectOptions[column.column]"
+                :key="index"
+                :label="option[column.option.key]"
+                :value="option[column.option.value]"
+              />
+            </el-select>
+            <el-switch
+              v-if="column.type === 'switch'"
+              inline-prompt
+              :inactive-text="column?.switch?.off"
+              :active-text="column?.switch?.on"
+              v-model="componentData.ruleForm[column.column]"
+            ></el-switch>
+          </template>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            @click="submitForm()"
+            v-html="componentData.isEdit ? '更新' : '添加'"
+          ></el-button>
+          <el-button @click="resetForm()">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+  </el-drawer>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, render, h, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import __ from 'lodash';
 
+const loading = ref(false);
 const formRef = ref();
 const tableRef = ref();
 const props = defineProps([
@@ -139,7 +134,6 @@ const props = defineProps([
 const apis = props.apis;
 
 let needDeleteIdArray = [];
-
 const editColumns = [];
 const tableColumns = [];
 const editForm = {};
@@ -205,7 +199,6 @@ const componentData = reactive({
   isShow: true,
   isEdit: false,
   tableData: [],
-  menuOptions: [],
   ruleForm: new Proxy(__.cloneDeep(editForm), handler),
 });
 
@@ -227,10 +220,11 @@ function rowSelectedChangeHandle(selection) {
  */
 function list() {
   componentData.tableData.splice(0, componentData.tableData.length);
+  loading.value = true;
   apis[props.methods.list](props.condition).then((res) => {
-    componentData.menuOptions.push(...__.cloneDeep(res.row));
     const tree = buildTree(res.row, -1);
     componentData.tableData.push(...tree);
+    loading.value = false;
   });
 }
 

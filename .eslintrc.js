@@ -32,5 +32,6 @@ module.exports = {
     'vue/valid-template-root': 'off',
     'vue/no-v-model-argument': 'off',
     'no-nested-ternary': 'off',
+    'vue/valid-v-for': 'off',
   },
 };
