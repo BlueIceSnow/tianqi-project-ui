@@ -1,6 +1,7 @@
 <template>
   <div class="nav-bar-container">
     <el-page-header
+      :title="isOpen ? '打开菜单' : '关闭菜单'"
       @click.stop="changeSideBar"
       :icon="isOpen ? 'el-icon-s-fold' : 'el-icon-s-unfold'"
     >
@@ -39,11 +40,11 @@
 
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="a">Action 1</el-dropdown-item>
-              <el-dropdown-item command="b">Action 2</el-dropdown-item>
-              <el-dropdown-item command="c">Action 3</el-dropdown-item>
-              <el-dropdown-item command="d" disabled>Action 4</el-dropdown-item>
-              <el-dropdown-item command="e" divided>Action 5</el-dropdown-item>
+              <el-dropdown-item command="logout">个人信息</el-dropdown-item>
+              <el-dropdown-item command="logout">修改密码</el-dropdown-item>
+              <el-dropdown-item command="logout">组织信息</el-dropdown-item>
+              <el-dropdown-item command="logout">更换头像</el-dropdown-item>
+              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown></el-space

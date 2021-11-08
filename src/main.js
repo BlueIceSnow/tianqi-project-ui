@@ -2,10 +2,11 @@ import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 import * as Icons from '@element-plus/icons';
 import 'element-plus/dist/index.css';
-import router from './router';
-import store from './store';
-import App from './App.vue';
 import './router/permission';
+
+import App from './App.vue';
+import store from './store';
+import router from './router';
 
 const app = createApp(App);
 app.use(ElementPlus);

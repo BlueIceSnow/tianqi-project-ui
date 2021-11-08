@@ -183,9 +183,9 @@ function closeAll() {
   padding: 5px;
   background-color: white;
   line-height: calc(#{$labelBarHeight} - 10px);
-  box-shadow: 0 1px 1px gainsboro;
+  box-shadow: 0px 1px 4px gainsboro;
   z-index: 9;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
   display: flex;
   flex-direction: row;
@@ -196,6 +196,9 @@ function closeAll() {
   height: 30px;
   line-height: 30px;
   margin-right: 8px;
+  background-color: white;
+  border: 1px solid gray;
+  color: black;
   cursor: pointer;
 }
 .fade-enter-active,
@@ -255,5 +258,12 @@ function closeAll() {
 }
 .activeTag .el-tag .el-icon-close {
   top: 0;
+  background-color: red;
+}
+.labelBar .activeTag :deep(.el-tag__close) {
+  color: white !important;
+}
+.labelBar :deep(.el-tag__close) {
+  color: black !important;
 }
 </style>

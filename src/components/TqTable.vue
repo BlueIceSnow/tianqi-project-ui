@@ -85,11 +85,44 @@
         </el-table-column>
         <el-table-column :fixed="false" label="操作">
           <template #default="scope">
-            <el-button type="text" size="small" @click="edit(scope.row)"
+            <el-button type="text" size="medium" @click="edit(scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" size="small" @click="remove(scope.row.id)"
+            <el-button type="text" size="medium" @click="remove(scope.row.id)"
               >删除
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+              v-for="(option, index) in options.filter(
+                (option) => !option.inMore
+              )"
+              :key="index"
+              :icon="option.icon"
+              @click="option.method(scope.row)"
+              ><span v-html="option.name"></span>
+            </el-button>
+            <el-button
+              type="text"
+              size="medium"
+              v-if="options.find((option) => option.inMore)"
+            >
+              <el-dropdown>
+                <span class="el-button--text el-button el-button--medium">
+                  更多<i class="el-icon-arrow-down"></i>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-for="(option, index) in options"
+                      :key="index"
+                      :icon="option.icon"
+                      @click="option.method(scope.row)"
+                      ><span v-html="option.name"></span
+                    ></el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </el-button>
           </template>
         </el-table-column>
@@ -182,16 +215,14 @@ import __ from 'lodash';
 
 const loading = ref(false);
 const formRef = ref();
-const tableRef = ref();
 const props = defineProps([
   'mainName',
   'columns',
   'condition',
   'rules',
-  'apis',
   'methods',
+  'options',
 ]);
-const apis = props.apis;
 
 let needDeleteIdArray = [];
 
@@ -199,6 +230,7 @@ const currentPage = ref(1);
 const pageSizes = reactive([5, 10, 15, 20, 25]);
 const pageSize = ref(5);
 const totalSize = ref(0);
+const options = props.options || [];
 const editColumns = [];
 const tableColumns = [];
 const searchColumns = [];
@@ -210,14 +242,20 @@ for (let i = 0; i < props.columns.length; i++) {
     editColumns.push(props.columns[i]);
     // 判断是不是select，如果是则获取其下拉选项
     if (props.columns[i].option) {
-      props.apis[props.columns[i].option.methodName](
-        props.columns[i].option.condition
-      ).then((res) => {
+      if (props.columns[i].option.method) {
+        props.columns[i].option
+          .method(props.columns[i].option.condition)
+          .then((res) => {
+            selectOptions[props.columns[i].column] = [
+              ...props.columns[i].option.default,
+              ...res.row,
+            ];
+          });
+      } else {
         selectOptions[props.columns[i].column] = [
           ...props.columns[i].option.default,
-          ...res.row,
         ];
-      });
+      }
     }
     __.set(
       editForm,
@@ -233,14 +271,14 @@ for (let i = 0; i < props.columns.length; i++) {
     searchColumns.push(props.columns[i]);
     // 判断是不是select，如果是则获取其下拉选项
     if (props.columns[i].option) {
-      props.apis[props.columns[i].option.methodName](
-        props.columns[i].option.condition
-      ).then((res) => {
-        selectOptions[props.columns[i].column] = [
-          ...props.columns[i].option.default,
-          ...res.row,
-        ];
-      });
+      props.columns[i].option
+        .method(props.columns[i].option.condition)
+        .then((res) => {
+          selectOptions[props.columns[i].column] = [
+            ...props.columns[i].option.default,
+            ...res.row,
+          ];
+        });
     }
     __.set(
       searchCondition,
@@ -308,7 +346,6 @@ onMounted(() => {
 function rowSelectedChangeHandle(selection) {
   needDeleteIdArray = [];
   needDeleteIdArray.push(...selection.map((item) => item.id));
-  console.log(selection);
 }
 /**
  * 查询数据信息
@@ -316,16 +353,19 @@ function rowSelectedChangeHandle(selection) {
 function list() {
   loading.value = true;
   componentData.tableData.splice(0, componentData.tableData.length);
-  apis[props.methods.list]({
-    ...props.condition,
-    ...componentData.searchCondition,
-    page: currentPage.value,
-    size: pageSize.value,
-  }).then((res) => {
-    componentData.tableData.push(...res.rows);
-    totalSize.value = res.total;
-    loading.value = false;
-  });
+  console.log(props.methods);
+  props.methods
+    .list({
+      ...props.condition,
+      ...componentData.searchCondition,
+      page: currentPage.value,
+      size: pageSize.value,
+    })
+    .then((res) => {
+      componentData.tableData.push(...res.rows);
+      totalSize.value = res.total;
+      loading.value = false;
+    });
 }
 
 /**
@@ -342,12 +382,12 @@ function saveWinOpen() {
 function submitForm() {
   if (componentData.ruleForm.id) {
     // 更新
-    apis[props.methods.update](componentData.ruleForm).then((res) => {
+    props.methods.update(componentData.ruleForm).then((res) => {
       list();
       componentData.isShow = false;
     });
   } else {
-    apis[props.methods.save](componentData.ruleForm).then((res) => {
+    props.methods.save(componentData.ruleForm).then((res) => {
       list();
       componentData.isShow = false;
     });
@@ -363,8 +403,8 @@ function edit(row) {
   // 先将表单置为空
   clearForm();
   const rowCopy = __.cloneDeep(row);
-  rowCopy.deleted = rowCopy.deleted.value;
-  rowCopy.closeable = rowCopy.closeable.value;
+  rowCopy.deleted = rowCopy?.deleted?.value;
+  rowCopy.closeable = rowCopy?.closeable?.value;
   componentData.ruleForm = new Proxy(rowCopy, handler);
 }
 
@@ -372,32 +412,36 @@ function edit(row) {
  * 删除菜单
  */
 function remove(id) {
-  apis[props.methods.remove](id, {
-    ...props.condition,
-    ...componentData.searchCondition,
-    page: currentPage.value,
-    size: pageSize.value,
-  }).then((res) => {
-    componentData.tableData.splice(0, componentData.tableData.length);
-    componentData.tableData.push(...res.rows);
-    totalSize.value = res.total;
-  });
+  props.methods
+    .remove(id, {
+      ...props.condition,
+      ...componentData.searchCondition,
+      page: currentPage.value,
+      size: pageSize.value,
+    })
+    .then((res) => {
+      componentData.tableData.splice(0, componentData.tableData.length);
+      componentData.tableData.push(...res.rows);
+      totalSize.value = res.total;
+    });
 }
 
 /**
  * 批量删除菜单
  */
 function batchRemove() {
-  apis[props.methods.batchRemove](needDeleteIdArray.toString(), {
-    ...props.condition,
-    ...componentData.searchCondition,
-    page: currentPage.value,
-    size: pageSize.value,
-  }).then((res) => {
-    componentData.tableData.splice(0, componentData.tableData.length);
-    componentData.tableData.push(...res.rows);
-    totalSize.value = res.total;
-  });
+  props.methods
+    .batchRemove(needDeleteIdArray.toString(), {
+      ...props.condition,
+      ...componentData.searchCondition,
+      page: currentPage.value,
+      size: pageSize.value,
+    })
+    .then((res) => {
+      componentData.tableData.splice(0, componentData.tableData.length);
+      componentData.tableData.push(...res.rows);
+      totalSize.value = res.total;
+    });
 }
 
 /**
@@ -469,7 +513,7 @@ function resetSearchHandler() {
   flex-direction: row;
   justify-content: start;
   align-items: center;
-  height: 7%;
+  height: 8%;
 }
 .body-wrap {
   height: 80%;
@@ -481,7 +525,7 @@ function resetSearchHandler() {
   justify-content: center;
   align-items: center;
   padding: 5px;
-  height: calc(13% - 20px);
+  height: calc(12% - 20px);
 }
 .condition-wrap {
   padding: 5px;

@@ -1,12 +1,12 @@
 <template>
   <div>
     <tq-tree-table
-      :apis="apis"
       :columns="columns"
       :main-name="mainName"
       :condition="condition"
       :rules="rules"
       :methods="methods"
+      :options="options"
     >
       <template #closeable="{ row }">
         <span v-html="row.closeable.value ? '是' : '否'"></span>
@@ -20,18 +20,29 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import apis from 'api/sys';
+import apis from 'api/resource';
 import TqTreeTable from 'components/TqTreeTable.vue';
 
 const mainName = ref('菜单');
 const condition = reactive({ type: 'M', appId: 1 });
 const methods = reactive({
-  list: 'loadMenuByAppId',
-  save: 'saveMenu',
-  update: 'updateMenu',
-  remove: 'removeMenu',
-  batchRemove: 'batchRemoveMenu',
+  list: apis.loadResByAppId,
+  save: apis.saveRes,
+  update: apis.updateRes,
+  remove: apis.removeRes,
+  batchRemove: apis.batchRemoveRes,
 });
+const options = reactive([
+  {
+    name: '授权资源',
+    slot: 'authorityRole',
+    method: (row) => {
+      console.log(row);
+    },
+    icon: 'el-icon-plus',
+    inMore: true,
+  },
+]);
 const columns = reactive([
   {
     column: 'id',
@@ -62,7 +73,7 @@ const columns = reactive([
     isEdit: true,
     type: 'select',
     option: {
-      methodName: 'loadMenuByAppId',
+      method: apis.loadResByAppId,
       condition: { type: 'M', appId: 1 },
       default: [{ id: -1, name: '顶级菜单' }],
       key: 'name',
@@ -87,7 +98,7 @@ const columns = reactive([
   {
     column: 'type',
     label: `类型`,
-    isShow: true,
+    isShow: false,
     isEdit: false,
     hidden: true,
     default: 'M',
@@ -119,21 +130,21 @@ const columns = reactive([
   {
     column: 'extField.isLink',
     label: `外链`,
-    isShow: true,
+    isShow: false,
     isEdit: true,
     type: 'switch',
   },
   {
     column: 'extField.isShow',
     label: `展示`,
-    isShow: true,
+    isShow: false,
     isEdit: true,
     type: 'switch',
   },
   {
     column: 'extField.isGroup',
     label: `分组`,
-    isShow: true,
+    isShow: false,
     isEdit: true,
     type: 'switch',
   },

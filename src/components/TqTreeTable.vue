@@ -46,6 +46,37 @@
         <el-button type="text" size="small" @click="remove(scope.row.id)"
           >删除
         </el-button>
+        <el-button
+          type="text"
+          size="small"
+          v-for="(option, index) in options.filter((option) => !option.inMore)"
+          :key="index"
+          :icon="option.icon"
+          @click="option.method(scope.row)"
+          ><span v-html="option.name"></span>
+        </el-button>
+        <el-button
+          type="text"
+          size="small"
+          v-if="options.find((option) => option.inMore)"
+        >
+          <el-dropdown>
+            <span class="el-button--text el-button el-button--small">
+              更多<i class="el-icon-arrow-down"></i>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="(option, index) in options"
+                  :key="index"
+                  :icon="option.icon"
+                  @click="option.method(scope.row)"
+                  ><span v-html="option.name"></span
+                ></el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -128,12 +159,12 @@ const props = defineProps([
   'columns',
   'condition',
   'rules',
-  'apis',
   'methods',
+  'options',
 ]);
-const apis = props.apis;
 
 let needDeleteIdArray = [];
+const options = props.options || [];
 const editColumns = [];
 const tableColumns = [];
 const editForm = {};
@@ -143,14 +174,20 @@ for (let i = 0; i < props.columns.length; i++) {
     editColumns.push(props.columns[i]);
     // 判断是不是select，如果是则获取其下拉选项
     if (props.columns[i].option) {
-      props.apis[props.columns[i].option.methodName](
-        props.columns[i].option.condition
-      ).then((res) => {
+      if (props.columns[i].option.method) {
+        props.columns[i].option
+          .method(props.columns[i].option.condition)
+          .then((res) => {
+            selectOptions[props.columns[i].column] = [
+              ...props.columns[i].option.default,
+              ...res.row,
+            ];
+          });
+      } else {
         selectOptions[props.columns[i].column] = [
           ...props.columns[i].option.default,
-          ...res.row,
         ];
-      });
+      }
     }
     __.set(
       editForm,
@@ -221,7 +258,7 @@ function rowSelectedChangeHandle(selection) {
 function list() {
   componentData.tableData.splice(0, componentData.tableData.length);
   loading.value = true;
-  apis[props.methods.list](props.condition).then((res) => {
+  props.methods.list(props.condition).then((res) => {
     const tree = buildTree(res.row, -1);
     componentData.tableData.push(...tree);
     loading.value = false;
@@ -242,12 +279,12 @@ function saveWinOpen() {
 function submitForm() {
   if (componentData.ruleForm.id) {
     // 更新
-    apis[props.methods.update](componentData.ruleForm).then((res) => {
+    props.methods.update(componentData.ruleForm).then((res) => {
       list();
       componentData.isShow = false;
     });
   } else {
-    apis[props.methods.save](componentData.ruleForm).then((res) => {
+    props.methods.save(componentData.ruleForm).then((res) => {
       list();
       componentData.isShow = false;
     });
@@ -272,12 +309,10 @@ function edit(row) {
  * 删除菜单
  */
 function remove(id) {
-  apis[props.methods.remove](id, props.condition).then((res) => {
+  props.methods.remove(id, props.condition).then((res) => {
     const tree = buildTree(res.row, -1);
-    console.log(res);
     componentData.tableData.splice(0, componentData.tableData.length);
     componentData.tableData.push(...tree);
-    console.error(componentData.tableData);
   });
 }
 
@@ -285,15 +320,14 @@ function remove(id) {
  * 批量删除菜单
  */
 function batchRemove() {
-  apis[props.methods.batchRemove](
-    needDeleteIdArray.toString(),
-    props.condition
-  ).then((res) => {
-    const tree = buildTree(res.row, -1);
-    console.log(res);
-    componentData.tableData.splice(0, componentData.tableData.length);
-    componentData.tableData.push(...tree);
-  });
+  props.methods
+    .batchRemove(needDeleteIdArray.toString(), props.condition)
+    .then((res) => {
+      const tree = buildTree(res.row, -1);
+      console.log(res);
+      componentData.tableData.splice(0, componentData.tableData.length);
+      componentData.tableData.push(...tree);
+    });
 }
 
 /**
@@ -328,22 +362,6 @@ function buildTree(list, parentId) {
     }
   }
   return root;
-}
-
-function findNodeFromTree(tree, matchVal, childKey, matchKey) {
-  let node = null;
-  for (let i = 0; i < tree.length; i++) {
-    if (tree[i][matchKey] === matchVal) {
-      node = tree[i];
-      break;
-    } else {
-      node = findNodeFromTree(tree[i][childKey], matchVal, childKey, matchKey);
-      if (node !== null) {
-        break;
-      }
-    }
-  }
-  return node;
 }
 </script>
 

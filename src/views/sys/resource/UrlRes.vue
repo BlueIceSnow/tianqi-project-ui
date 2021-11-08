@@ -1,7 +1,6 @@
 <template>
   <div>
     <tq-tree-table
-      :apis="apis"
       :columns="columns"
       :main-name="mainName"
       :condition="condition"
@@ -16,17 +15,17 @@
 </template>
 <script setup>
 import { reactive, ref } from 'vue';
-import apis from 'api/sys';
+import apis from 'api/resource';
 import TqTreeTable from 'components/TqTreeTable.vue';
 
 const mainName = ref('接口');
 const condition = reactive({ type: 'U', appId: 1 });
 const methods = reactive({
-  list: 'loadMenuByAppId',
-  save: 'saveMenu',
-  update: 'updateMenu',
-  remove: 'removeMenu',
-  batchRemove: 'batchRemoveMenu',
+  list: apis.loadResByAppId,
+  save: apis.saveRes,
+  update: apis.updateRes,
+  remove: apis.removeRes,
+  batchRemove: apis.batchRemoveRes,
 });
 const columns = reactive([
   {
@@ -57,7 +56,7 @@ const columns = reactive([
     isEdit: true,
     type: 'select',
     option: {
-      methodName: 'loadMenuByAppId',
+      method: apis.loadResByAppId,
       condition: { type: 'U', appId: 1 },
       default: [{ id: -1, name: '顶级接口' }],
       key: 'name',
