@@ -92,8 +92,8 @@ const columns = reactive([
     column: 'icon',
     label: `图标`,
     isShow: true,
-    isEdit: false,
-    type: 'switch',
+    isEdit: true,
+    type: 'input',
   },
   {
     column: 'type',

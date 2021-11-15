@@ -5,6 +5,9 @@
       @click.stop="changeSideBar"
       :icon="isOpen ? 'el-icon-s-fold' : 'el-icon-s-unfold'"
     >
+      <template #icon
+        ><el-icon><expand v-if="isOpen" /><fold v-else /></el-icon
+      ></template>
       <template #content>
         <div style="height: 40px; line-height: 40px; padding-top: 13px">
           <el-breadcrumb separator="/">

@@ -22,7 +22,7 @@
         :index="menu.id.toString()"
         @click="clickItem(menu.name, menu.url, menu.closeable.value, menu.id)"
       >
-        <i :class="menu.icon"></i>
+        <el-icon><component :is="menu.icon"></component></el-icon>
         <template #title>{{ menu.name }}</template></el-menu-item
       >
       <el-menu-item-group v-else>

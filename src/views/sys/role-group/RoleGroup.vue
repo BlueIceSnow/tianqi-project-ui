@@ -9,23 +9,42 @@
       :methods="methods"
       :options="options"
     >
+      <template #closeable="{ row }">
+        <span v-html="row.closeable.value ? '是' : '否'"></span>
+      </template>
     </tq-table>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue';
-import apis from 'api/user';
+import apis from 'api/role-group';
 import TqTable from 'components/TqTable.vue';
 
-const mainName = ref('用户');
-const condition = reactive({});
+const props = defineProps(['appId']);
+const mainName = ref('角色组');
+const condition = reactive({ appId: props.appId });
+
+const options = reactive([
+  {
+    name: '授权',
+    slot: 'authorityRole',
+    method: addRole,
+    icon: 'el-icon-plus',
+    inMore: true,
+  },
+]);
+
+function addRole(row) {
+  console.log(row);
+}
+
 const methods = reactive({
-  list: apis.loadUserListByPage,
-  save: apis.saveUser,
-  update: apis.updateUser,
-  remove: apis.removeUserByPage,
-  batchRemove: apis.batchRemoveUserByPage,
+  list: apis.loadRoleGroupListByPage,
+  save: apis.saveRoleGroup,
+  update: apis.updateRoleGroup,
+  remove: apis.removeRoleGroupByPage,
+  batchRemove: apis.batchRemoveRoleGroupByPage,
 });
 const columns = reactive([
   {
@@ -44,30 +63,28 @@ const columns = reactive([
     default: null,
     type: 'input',
   },
-]);
-const options = reactive([
   {
-    name: '授权资源',
-    slot: 'authorityRole',
-    method: (row) => {
-      console.log(row);
-    },
-    icon: 'el-icon-plus',
-    inMore: true,
+    column: 'appId',
+    label: `应用ID`,
+    isShow: false,
+    isEdit: false,
+    hidden: true,
+    type: 'input',
+    default: props.appId,
   },
 ]);
 const rules = reactive({
   name: [
     {
       required: true,
-      message: '请输入应用名称',
+      message: '请输入路由名称',
       trigger: 'blur',
     },
   ],
-  appKey: [
+  parentId: [
     {
       required: true,
-      message: '请输入应用Key',
+      message: '请选择上级路由',
       trigger: 'change',
     },
   ],

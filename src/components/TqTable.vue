@@ -1,11 +1,12 @@
 <template>
   <div class="wrap">
     <div style="padding-bottom: 10px" class="header-wrap">
-      <el-button type="primary" icon="el-icon-plus" @click="saveWinOpen">
+      <el-button type="primary" @click="saveWinOpen">
+        <el-icon><circle-plus /></el-icon>
         <span v-html="`新增${props.mainName}`"></span>
       </el-button>
-      <el-button type="primary" icon="el-icon-minus" @click="batchRemove"
-        >批量删除
+      <el-button type="primary" @click="batchRemove"
+        ><el-icon><circle-close /></el-icon><span>批量删除</span>
       </el-button>
 
       <div
@@ -107,7 +108,7 @@
               size="medium"
               v-if="options.find((option) => option.inMore)"
             >
-              <el-dropdown>
+              <el-dropdown size="small">
                 <span class="el-button--text el-button el-button--medium">
                   更多<i class="el-icon-arrow-down"></i>
                 </span>
@@ -201,7 +202,7 @@
               @click="submitForm()"
               v-html="componentData.isEdit ? '更新' : '添加'"
             ></el-button>
-            <el-button @click="resetForm()">重置</el-button>
+            <el-button type="primary" @click="resetForm()">重置</el-button>
           </el-form-item>
         </el-form>
       </div>

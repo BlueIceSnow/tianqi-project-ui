@@ -10,22 +10,35 @@
       :options="options"
     >
     </tq-table>
+    <tq-relation-table-dialog
+      :dialog-title="'授权应用'"
+      :show-fields="[
+        { column: 'date', label: '日期' },
+        { column: 'name', label: '名称' },
+        { column: 'address', label: '地址' },
+      ]"
+      :submit-title="'授权'"
+      ref="dialog"
+    />
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-import apis from 'api/user';
+import { reactive, ref, provide, onMounted } from 'vue';
+import apis from 'api/tenant';
 import TqTable from 'components/TqTable.vue';
+import TqRelationTableDialog from 'components/TqRelationTableDialog.vue';
 
-const mainName = ref('用户');
+const authorityApplicationDialogShow = ref(false);
+provide('isShow', authorityApplicationDialogShow);
+const mainName = ref('租户');
 const condition = reactive({});
 const methods = reactive({
-  list: apis.loadUserListByPage,
-  save: apis.saveUser,
-  update: apis.updateUser,
-  remove: apis.removeUserByPage,
-  batchRemove: apis.batchRemoveUserByPage,
+  list: apis.loadTenantListByPage,
+  save: apis.saveTenant,
+  update: apis.updateTenant,
+  remove: apis.removeTenantByPage,
+  batchRemove: apis.batchRemoveTenantByPage,
 });
 const columns = reactive([
   {
@@ -45,12 +58,15 @@ const columns = reactive([
     type: 'input',
   },
 ]);
+
+const dialog = ref(null);
+
 const options = reactive([
   {
-    name: '授权资源',
+    name: '授权应用',
     slot: 'authorityRole',
     method: (row) => {
-      console.log(row);
+      dialog.value.openDialog(row);
     },
     icon: 'el-icon-plus',
     inMore: true,

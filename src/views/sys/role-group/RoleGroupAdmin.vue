@@ -2,7 +2,7 @@
   <div>
     <tq-application-tab>
       <template #default="{ application }">
-        <Role :appId="application.id"></Role>
+        <RoleGroup :appId="application.id"></RoleGroup>
       </template>
     </tq-application-tab>
   </div>
@@ -10,7 +10,7 @@
 
 <script setup>
 import TqApplicationTab from 'components/TqApplicationTab.vue';
-import Role from './Role.vue';
+import RoleGroup from './RoleGroup.vue';
 </script>
 
 <style scoped lang="scss"></style>

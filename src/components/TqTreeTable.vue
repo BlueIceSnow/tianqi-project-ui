@@ -1,6 +1,7 @@
 <template>
   <div style="padding-bottom: 10px" class="menu">
-    <el-button type="primary" icon="el-icon-plus" @click="saveWinOpen">
+    <el-button type="primary" @click="saveWinOpen">
+      <el-icon><circle-plus /></el-icon>
       <span v-html="`新增${props.mainName}`"></span>
     </el-button>
     <el-button type="primary" icon="el-icon-minus" @click="batchRemove"
@@ -60,7 +61,7 @@
           size="small"
           v-if="options.find((option) => option.inMore)"
         >
-          <el-dropdown>
+          <el-dropdown size="small">
             <span class="el-button--text el-button el-button--small">
               更多<i class="el-icon-arrow-down"></i>
             </span>
@@ -140,7 +141,7 @@
             @click="submitForm()"
             v-html="componentData.isEdit ? '更新' : '添加'"
           ></el-button>
-          <el-button @click="resetForm()">重置</el-button>
+          <el-button type="primary" @click="resetForm()">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -300,8 +301,8 @@ function edit(row) {
   // 先将表单置为空
   clearForm();
   const rowCopy = __.cloneDeep(row);
-  rowCopy.deleted = rowCopy.deleted.value;
-  rowCopy.closeable = rowCopy.closeable.value;
+  rowCopy.deleted = rowCopy?.deleted?.value;
+  rowCopy.closeable = rowCopy?.closeable?.value;
   componentData.ruleForm = new Proxy(rowCopy, handler);
 }
 

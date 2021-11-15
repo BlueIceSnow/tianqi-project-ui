@@ -1,8 +1,10 @@
 <template>
-  <div id="line" style="width: 100%; height: 25%">dashboard</div>
-  <div id="bar" style="width: 100%; height: 25%"></div>
-  <div id="pie" style="width: 100%; height: 25%"></div>
-  <div id="scatter" style="width: 100%; height: 25%"></div>
+  <div class="wrap">
+    <div id="line" style="width: 100%; height: 25%">dashboard</div>
+    <div id="bar" style="width: 100%; height: 25%"></div>
+    <div id="pie" style="width: 100%; height: 25%"></div>
+    <div id="scatter" style="width: 100%; height: 25%"></div>
+  </div>
 </template>
 
 <script setup>
@@ -114,4 +116,9 @@ const age = ref(10);
 const sex = ref(20);
 </script>
 
-<style scoped></style>
+<style scoped>
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+</style>

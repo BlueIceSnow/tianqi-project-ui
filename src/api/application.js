@@ -57,10 +57,20 @@ function batchRemoveApplicationByPage(ids, condition) {
   );
 }
 
+/**
+ * 获取当前登录用户拥有的应用列表
+ */
+function loadApplicationListByCurrentUser() {
+  return doGet(
+    `/api/auth/tqAuthTenantApplicationRelation/loadApplicationListByCurrentUser`
+  );
+}
+
 export default {
   loadAppListByPage,
   updateApplication,
   saveApplication,
   removeApplicationByPage,
   batchRemoveApplicationByPage,
+  loadApplicationListByCurrentUser,
 };

@@ -3,6 +3,8 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import viteESLint from '@ehutch79/vite-eslint';
 import { viteMockServe } from 'vite-plugin-mock';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
   root: './',
@@ -11,7 +13,7 @@ export default defineConfig({
   publicDir: 'public',
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '~/': `${resolve(__dirname, 'src')}/`,
       components: resolve(__dirname, 'src/components'),
       views: resolve(__dirname, 'src/views'),
       utils: resolve(__dirname, 'src/utils'),
@@ -31,6 +33,13 @@ export default defineConfig({
       },
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "~/theme/index.scss" as *;`,
+      },
+    },
+  },
   plugins: [
     vue(),
     viteESLint({ include: ['src/**/*.vue', 'src/**/*.js'] }),
@@ -38,6 +47,13 @@ export default defineConfig({
       // default
       mockPath: 'src/mock',
       supportTs: false,
+    }),
+    Components({
+      resolvers: [
+        ElementPlusResolver({
+          importStyle: 'sass',
+        }),
+      ],
     }),
   ],
 });
