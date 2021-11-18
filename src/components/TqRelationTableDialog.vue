@@ -33,66 +33,52 @@
 </template>
 
 <script setup>
-import { reactive, ref, defineExpose, defineProps } from 'vue';
+import { reactive, ref, defineExpose, defineProps, onMounted } from 'vue';
 
 const props = defineProps([
   'dialogTitle',
   'submitTitle',
   'showFields',
-  'mainKey',
-  'subKey',
+  'relationKey',
+  'relationSubKey',
+  'mainParamKey',
+  'subParamKey',
   'submitMethod',
+  'loadDataMethod',
+  'loadRelationDataMethod',
+  'constSubmitParams',
 ]);
 
 const authorityApplicationDialogShow = ref(false);
 const currentRow = ref(null);
-const tableData = reactive([
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-08',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-06',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-07',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]);
+const currentSelectionRows = ref([]);
+const tableData = reactive([]);
+const multipleTable = ref();
+onMounted(() => {
+  props.loadDataMethod().then((res) => {
+    tableData.push(...res.row);
+  });
+});
 
-function handleSelectionChange(row) {}
+function handleSelectionChange(row) {
+  currentSelectionRows.value.splice(0, currentSelectionRows.value.length);
+  currentSelectionRows.value.push(...row);
+}
 
+/**
+ * 提交关系绑定
+ */
 function submit() {
-  props
-    .submitMethod({ mainKey: props.mainKey, subKey: props.subKey })
-    .then((res) => {
-      console.log(res);
-      authorityApplicationDialogShow.value = false;
-    });
+  const mainKey = props.mainParamKey;
+  const subKey = props.subParamKey;
+  const params = {};
+  params[mainKey] = currentRow.value[props.relationKey];
+  params[subKey] = currentSelectionRows.value
+    .map((item) => item[props.relationKey])
+    .toString();
+  props.submitMethod({ params, ...props.constSubmitParams }).then((res) => {
+    authorityApplicationDialogShow.value = false;
+  });
 }
 
 /**
@@ -102,6 +88,17 @@ function submit() {
 function openDialog(row) {
   authorityApplicationDialogShow.value = true;
   currentRow.value = row;
+  currentSelectionRows.value = [];
+  multipleTable.value?.clearSelection();
+  props.loadRelationDataMethod(row[props.relationKey]).then((res) => {
+    const keys = res.row.map((item) => item[props.relationSubKey]);
+    const needSelectedRows = tableData.filter(
+      (item) => keys.indexOf(item[props.relationKey]) > -1
+    );
+    needSelectedRows.forEach((item) => {
+      multipleTable.value.toggleRowSelection(item, true);
+    });
+  });
 }
 defineExpose({
   openDialog,

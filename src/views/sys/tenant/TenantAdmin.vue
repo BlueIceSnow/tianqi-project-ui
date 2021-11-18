@@ -12,12 +12,19 @@
     </tq-table>
     <tq-relation-table-dialog
       :dialog-title="'授权应用'"
-      :show-fields="[
-        { column: 'date', label: '日期' },
-        { column: 'name', label: '名称' },
-        { column: 'address', label: '地址' },
-      ]"
       :submit-title="'授权'"
+      :relation-key="'id'"
+      :relation-sub-key="'appId'"
+      :main-param-key="'tenantId'"
+      :sub-param-key="'applicationIds'"
+      :submit-method="apis.authoriseApplicationToTenant"
+      :load-data-method="applicationApis.loadApplicationListByCurrentUser"
+      :load-relation-data-method="apis.loadAuthorisedApplicationList"
+      :show-fields="[
+        { column: 'id', label: 'ID' },
+        { column: 'name', label: '名称' },
+        { column: 'appKey', label: '应用KEY' },
+      ]"
       ref="dialog"
     />
   </div>
@@ -26,6 +33,7 @@
 <script setup>
 import { reactive, ref, provide, onMounted } from 'vue';
 import apis from 'api/tenant';
+import applicationApis from 'api/application';
 import TqTable from 'components/TqTable.vue';
 import TqRelationTableDialog from 'components/TqRelationTableDialog.vue';
 

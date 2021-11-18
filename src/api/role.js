@@ -17,6 +17,15 @@ function loadRoleListByPage(condition) {
 }
 
 /**
+ * 加载角色列表
+ * @param condition
+ * @returns {Promise<AxiosResponse<*>>}
+ */
+function loadRoleList(condition) {
+  return doGet('/api/auth/tqAuthRole', condition);
+}
+
+/**
  * 更新角色
  * @param application
  * @returns {Promise<AxiosResponse<*>>}
@@ -54,10 +63,16 @@ function batchRemoveRoleByPage(ids, condition) {
   return doDelete(`/api/auth/tqAuthRole/batchRemoveByPage/${ids}`, condition);
 }
 
+function authoriseMenuToRole(params) {
+  return doPut('', params);
+}
+
 export default {
   loadRoleListByPage,
   updateRole,
   saveRole,
   removeRoleByPage,
   batchRemoveRoleByPage,
+  authoriseMenuToRole,
+  loadRoleList,
 };

@@ -4,10 +4,10 @@
       <template #default="{ application }">
         <el-tabs class="sub-tabs" v-model="activeTabName" type="border-card">
           <el-tab-pane label="菜单资源" name="menuRes">
-            <menu-res :appId="application.id" />
+            <menu-res :app-id="application.id" />
           </el-tab-pane>
           <el-tab-pane label="接口资源" name="urlRes"
-            ><url-res :appId="application.id"
+            ><url-res :app-id="application.id"
           /></el-tab-pane>
           <el-tab-pane label="数据资源" name="dataRes">数据资源</el-tab-pane>
           <el-tab-pane label="按钮资源" name="buttonRes"

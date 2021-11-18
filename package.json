@@ -1,6 +1,7 @@
 {
   "name": "tq-project-ui",
   "version": "0.0.0",
+  "license": "UNLICENSED",
   "scripts": {
     "serve": "vite preview --host 127.0.0.1 --base ./",
     "build": "vite build --base ./",

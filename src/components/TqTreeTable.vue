@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-bottom: 10px" class="menu">
+  <div class="menu">
     <el-button type="primary" @click="saveWinOpen">
       <el-icon><circle-plus /></el-icon>
       <span v-html="`新增${props.mainName}`"></span>
@@ -116,7 +116,20 @@
             ></el-input>
             <el-select
               v-if="column.type === 'select'"
-              v-model="componentData.ruleForm.parentId"
+              v-model="componentData.ruleForm[column.column]"
+              :placeholder="column.label"
+            >
+              <el-option
+                v-for="(option, index) in selectOptions[column.column]"
+                :key="index"
+                :label="option[column.option.key]"
+                :value="option[column.option.value]"
+              />
+            </el-select>
+            <el-select
+              v-if="column.type === 'multiple-select'"
+              multiple
+              v-model="componentData.ruleForm[column.column]"
               :placeholder="column.label"
             >
               <el-option
@@ -369,6 +382,16 @@ function buildTree(list, parentId) {
 <style scoped lang="scss">
 .form-wrap {
   padding: 10px;
+}
+
+.menu {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  height: 8%;
 }
 
 :deep(.el-drawer__body) {

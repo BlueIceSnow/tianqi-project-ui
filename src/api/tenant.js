@@ -54,10 +54,31 @@ function batchRemoveTenantByPage(ids, condition) {
   return doDelete(`/api/auth/tqAuthTenant/batchRemoveByPage/${ids}`, condition);
 }
 
+/**
+ * 为租户授权应用
+ * @param params
+ * @returns {Promise<AxiosResponse<*>>}
+ */
+function authoriseApplicationToTenant(params) {
+  return doPut(
+    `/api/auth/tqAuthTenantApplicationRelation/authorisedApplicationToTenant`,
+    params
+  );
+}
+
+function loadAuthorisedApplicationList(tenantId) {
+  return doGet(
+    `/api/auth/tqAuthTenantApplicationRelation/loadTenantRelationApplicationList`,
+    { tenantId }
+  );
+}
+
 export default {
   loadTenantListByPage,
   updateTenant,
   saveTenant,
   removeTenantByPage,
   batchRemoveTenantByPage,
+  authoriseApplicationToTenant,
+  loadAuthorisedApplicationList,
 };

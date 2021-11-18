@@ -6,7 +6,6 @@
       :condition="condition"
       :rules="rules"
       :methods="methods"
-      :options="options"
     >
       <template #closeable="{ row }">
         <span v-html="row.closeable.value ? '是' : '否'"></span>
@@ -23,8 +22,9 @@ import { reactive, ref } from 'vue';
 import apis from 'api/resource';
 import TqTreeTable from 'components/TqTreeTable.vue';
 
+const props = defineProps(['appId']);
 const mainName = ref('菜单');
-const condition = reactive({ type: 'M', appId: 1 });
+const condition = reactive({ type: 'M', appId: props.appId });
 const methods = reactive({
   list: apis.loadResByAppId,
   save: apis.saveRes,
@@ -32,17 +32,7 @@ const methods = reactive({
   remove: apis.removeRes,
   batchRemove: apis.batchRemoveRes,
 });
-const options = reactive([
-  {
-    name: '授权资源',
-    slot: 'authorityRole',
-    method: (row) => {
-      console.log(row);
-    },
-    icon: 'el-icon-plus',
-    inMore: true,
-  },
-]);
+
 const columns = reactive([
   {
     column: 'id',
@@ -74,7 +64,7 @@ const columns = reactive([
     type: 'select',
     option: {
       method: apis.loadResByAppId,
-      condition: { type: 'M', appId: 1 },
+      condition: { type: 'M', appId: props.appId },
       default: [{ id: -1, name: '顶级菜单' }],
       key: 'name',
       value: 'id',

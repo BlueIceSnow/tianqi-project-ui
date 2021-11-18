@@ -18,8 +18,9 @@ import { reactive, ref } from 'vue';
 import apis from 'api/resource';
 import TqTreeTable from 'components/TqTreeTable.vue';
 
+const props = defineProps(['appId']);
 const mainName = ref('接口');
-const condition = reactive({ type: 'U', appId: 1 });
+const condition = reactive({ type: 'U', appId: props.appId });
 const methods = reactive({
   list: apis.loadResByAppId,
   save: apis.saveRes,
