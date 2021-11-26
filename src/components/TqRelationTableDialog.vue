@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, defineExpose, defineProps, onMounted } from 'vue';
+import { reactive, ref, onMounted, watch } from 'vue';
 
 const props = defineProps([
   'dialogTitle',
@@ -47,15 +47,44 @@ const props = defineProps([
   'loadDataMethod',
   'loadRelationDataMethod',
   'constSubmitParams',
+  'constQueryParams',
 ]);
+
+watch(
+  () => props.constQueryParams,
+  () => {
+    tableData.splice(0, tableData.length);
+    props.loadDataMethod(props.constQueryParams).then((res) => {
+      tableData.push(...res.row);
+      const queryParams = {};
+      if (currentRow.value) {
+        queryParams[props.mainParamKey] = currentRow.value[props.relationKey];
+      }
+      props
+        .loadRelationDataMethod({ ...queryParams, ...props.constQueryParams })
+        .then((res) => {
+          const keys = res.row.map((item) => item[props.relationSubKey]);
+          beforeSelectIds.value = new Set([...keys]);
+          const needSelectedRows = tableData.filter(
+            (item) => keys.indexOf(item[props.relationKey]) > -1
+          );
+          needSelectedRows.forEach((item) => {
+            multipleTable.value.toggleRowSelection(item, true);
+          });
+          console.log(keys);
+        });
+    });
+  }
+);
 
 const authorityApplicationDialogShow = ref(false);
 const currentRow = ref(null);
 const currentSelectionRows = ref([]);
 const tableData = reactive([]);
 const multipleTable = ref();
+const beforeSelectIds = ref(new Set([]));
 onMounted(() => {
-  props.loadDataMethod().then((res) => {
+  props.loadDataMethod(props.constQueryParams).then((res) => {
     tableData.push(...res.row);
   });
 });
@@ -72,11 +101,24 @@ function submit() {
   const mainKey = props.mainParamKey;
   const subKey = props.subParamKey;
   const params = {};
+  const selectedDataIds = currentSelectionRows.value.map(
+    (item) => item[props.relationKey]
+  );
   params[mainKey] = currentRow.value[props.relationKey];
-  params[subKey] = currentSelectionRows.value
-    .map((item) => item[props.relationKey])
-    .toString();
-  props.submitMethod({ params, ...props.constSubmitParams }).then((res) => {
+  params[subKey] = [
+    ...new Set(
+      [...selectedDataIds].filter((item) => !beforeSelectIds.value.has(item))
+    ),
+  ].toString();
+  params[`${subKey}Deleted`] = [
+    ...new Set(
+      [...beforeSelectIds.value].filter(
+        (item) => !new Set([...selectedDataIds]).has(item)
+      )
+    ),
+  ].toString();
+
+  props.submitMethod({ ...params, ...props.constSubmitParams }).then((res) => {
     authorityApplicationDialogShow.value = false;
   });
 }
@@ -90,15 +132,20 @@ function openDialog(row) {
   currentRow.value = row;
   currentSelectionRows.value = [];
   multipleTable.value?.clearSelection();
-  props.loadRelationDataMethod(row[props.relationKey]).then((res) => {
-    const keys = res.row.map((item) => item[props.relationSubKey]);
-    const needSelectedRows = tableData.filter(
-      (item) => keys.indexOf(item[props.relationKey]) > -1
-    );
-    needSelectedRows.forEach((item) => {
-      multipleTable.value.toggleRowSelection(item, true);
+  const queryParams = {};
+  queryParams[props.mainParamKey] = row[props.relationKey];
+  props
+    .loadRelationDataMethod({ ...queryParams, ...props.constQueryParams })
+    .then((res) => {
+      const keys = res.row.map((item) => item[props.relationSubKey]);
+      beforeSelectIds.value = new Set([...keys]);
+      const needSelectedRows = tableData.filter(
+        (item) => keys.indexOf(item[props.relationKey]) > -1
+      );
+      needSelectedRows.forEach((item) => {
+        multipleTable.value.toggleRowSelection(item, true);
+      });
     });
-  });
 }
 defineExpose({
   openDialog,

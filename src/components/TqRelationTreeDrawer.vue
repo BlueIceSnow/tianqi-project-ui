@@ -2,6 +2,7 @@
   <el-drawer
     v-model="authorityApplicationDrawerShow"
     :title="props.drawerTitle"
+    :destroy-on-close="true"
     size="40%"
   >
     <div class="tree-wrap">
@@ -28,7 +29,7 @@
 </template>
 
 <script setup>
-import { defineExpose, defineProps, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps([
   'drawerTitle',
@@ -41,6 +42,7 @@ const props = defineProps([
   'loadDataMethod',
   'loadRelationDataMethod',
   'constSubmitParams',
+  'constQueryParams',
   'nodeKey',
   'label',
 ]);
@@ -48,11 +50,12 @@ const props = defineProps([
 const currentRow = ref(null);
 const authorityApplicationDrawerShow = ref(false);
 const tree = ref();
+const beforeSelectIds = ref(new Set([]));
 
 const treeData = ref([]);
 let treeList = [];
 onMounted(() => {
-  props.loadDataMethod().then((res) => {
+  props.loadDataMethod(props.constQueryParams).then((res) => {
     treeData.value.splice(0, treeData.value.length);
     treeList = res.row;
     const tree = buildTree(res.row, -1);
@@ -84,13 +87,25 @@ function submit() {
   const mainKey = props.mainParamKey;
   const subKey = props.subParamKey;
   const params = {};
-  params[mainKey] = currentRow.value[props.relationKey];
-  params[subKey] = tree.value
+  const selectedDataIds = tree.value
     .getCheckedNodes(false, true)
-    .map((item) => item[props.relationKey])
-    .toString();
+    .map((item) => item[props.relationKey]);
+  params[mainKey] = currentRow.value[props.relationKey];
+  params[mainKey] = currentRow.value[props.relationKey];
+  params[subKey] = [
+    ...new Set(
+      [...selectedDataIds].filter((item) => !beforeSelectIds.value.has(item))
+    ),
+  ].toString();
+  params[`${subKey}Deleted`] = [
+    ...new Set(
+      [...beforeSelectIds.value].filter(
+        (item) => !new Set([...selectedDataIds]).has(item)
+      )
+    ),
+  ].toString();
   props.submitMethod({ ...params, ...props.constSubmitParams }).then((res) => {
-    authorityApplicationDialogShow.value = false;
+    authorityApplicationDrawerShow.value = false;
   });
 }
 /**
@@ -100,20 +115,22 @@ function submit() {
 function openDrawer(row) {
   authorityApplicationDrawerShow.value = true;
   currentRow.value = row;
-  // props.loadRelationDataMethod(row[props.relationKey]).then((res) => {
-  //   const keys = res.row.map((item) => item[props.relationSubKey]);
-  setTimeout(() => {
-    [1, 3, 40, 45].forEach((item) => {
-      const existEle = treeList.find(
-        (element) => element[props.relationKey] === item
-      );
-      if (existEle.children.length === 0) {
-        tree.value?.setChecked(existEle[props.relationKey], true);
-      }
+  const queryParams = {};
+  queryParams[props.mainParamKey] = row[props.relationKey];
+  props
+    .loadRelationDataMethod({ ...queryParams, ...props.constQueryParams })
+    .then((res) => {
+      const keys = res.row.map((item) => item[props.relationSubKey]);
+      beforeSelectIds.value = new Set([...keys]);
+      keys.forEach((item) => {
+        const existEle = treeList.find(
+          (element) => element[props.relationKey] === item
+        );
+        if (existEle.children.length === 0) {
+          tree.value?.setChecked(existEle[props.relationKey], true);
+        }
+      });
     });
-  }, 1000);
-
-  // });
 }
 defineExpose({
   openDrawer,

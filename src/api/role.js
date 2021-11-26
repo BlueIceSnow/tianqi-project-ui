@@ -63,8 +63,22 @@ function batchRemoveRoleByPage(ids, condition) {
   return doDelete(`/api/auth/tqAuthRole/batchRemoveByPage/${ids}`, condition);
 }
 
-function authoriseMenuToRole(params) {
-  return doPut('', params);
+function authoriseResToRole(params) {
+  return doPut(
+    '/api/auth/tqAuthRoleResourceRelation/authoriseResToRole',
+    params
+  );
+}
+
+/**
+ * 根据角色ID获取已授权的菜单列表
+ * @param params
+ */
+function loadAuthorisedResByRoleId(params) {
+  return doGet(
+    '/api/auth/tqAuthRoleResourceRelation/loadAuthorisedResByRoleId',
+    params
+  );
 }
 
 export default {
@@ -73,6 +87,7 @@ export default {
   saveRole,
   removeRoleByPage,
   batchRemoveRoleByPage,
-  authoriseMenuToRole,
+  authoriseResToRole,
+  loadAuthorisedResByRoleId,
   loadRoleList,
 };

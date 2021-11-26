@@ -11,19 +11,63 @@
       <el-input v-model="form[column.column]"></el-input>
     </template>
   </tq-tree-table>
+  <tq-relation-table-dialog
+    :dialog-title="'授权用户'"
+    :submit-title="'授权'"
+    :relation-key="'id'"
+    :relation-sub-key="'userId'"
+    :main-param-key="'orgId'"
+    :sub-param-key="'userIds'"
+    :submit-method="apis.authorizeUserToOrg"
+    :load-data-method="userApis.loadUserList"
+    :load-relation-data-method="apis.loadAuthorizedUserList"
+    :const-query-params="{ tenantId, appId }"
+    :const-submit-params="{ appId: props.appId }"
+    :show-fields="[
+      { column: 'id', label: 'ID' },
+      { column: 'name', label: '用户名' },
+    ]"
+    ref="authorizeUser"
+  />
+  <tq-relation-table-dialog
+    :dialog-title="'授权角色'"
+    :submit-title="'授权'"
+    :relation-key="'id'"
+    :relation-sub-key="'roleId'"
+    :main-param-key="'orgId'"
+    :sub-param-key="'roleIds'"
+    :submit-method="apis.authorizeRoleToOrg"
+    :load-data-method="roleApis.loadRoleList"
+    :load-relation-data-method="apis.loadAuthorizedRoleList"
+    :const-query-params="{ appId: props.appId, tenantId }"
+    :show-fields="[
+      { column: 'id', label: 'ID' },
+      { column: 'name', label: '角色名' },
+    ]"
+    ref="authorizeRole"
+  />
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue';
+import { useStore } from 'vuex';
 import apis from 'api/organization';
+import userApis from 'api/user';
+import roleApis from 'api/role';
 import TqTreeTable from 'components/TqTreeTable.vue';
+import TqRelationTableDialog from 'components/TqRelationTableDialog.vue';
 
 const props = defineProps(['appId']);
+const store = useStore();
+const tenantId = store.getters['user/userInfo']?.tenantId;
+
+const authorizeUser = ref();
+const authorizeRole = ref();
 
 const mainName = ref('组织');
-const condition = reactive({ appId: props.appId });
+const condition = reactive({ appId: props.appId, tenantId });
 const methods = reactive({
-  list: apis.loadOrgByAppId,
+  list: apis.loadOrg,
   save: apis.saveOrg,
   update: apis.updateOrg,
   remove: apis.removeOrg,
@@ -31,12 +75,17 @@ const methods = reactive({
 });
 const options = reactive([
   {
-    name: '授权资源',
+    name: '授权用户',
     slot: 'authorityRole',
-    method: (row) => {
-      console.log(row);
-    },
-    icon: 'el-icon-plus',
+    method: (row) => authorizeUser.value.openDialog(row),
+    icon: 'Plus',
+    inMore: true,
+  },
+  {
+    name: '授权角色',
+    slot: 'authorityRole',
+    method: (row) => authorizeRole.value.openDialog(row),
+    icon: 'Plus',
     inMore: true,
   },
 ]);
@@ -63,7 +112,7 @@ const columns = reactive([
     type: 'select',
     option: {
       method: apis.loadOrgByAppId,
-      condition: { appId: 1 },
+      condition: { appId: props.appId },
       default: [{ id: -1, name: '顶级组织' }],
       key: 'name',
       value: 'id',

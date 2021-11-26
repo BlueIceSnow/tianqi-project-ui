@@ -16,6 +16,10 @@ function loadTenantListByPage(condition) {
   return doGet('/api/auth/tqAuthTenant/page', condition);
 }
 
+function loadTenantList(params) {
+  return doGet('/api/auth/tqAuthTenant', params);
+}
+
 /**
  * 更新应用
  * @param application
@@ -31,7 +35,7 @@ function updateTenant(application) {
  * @returns {Promise<AxiosResponse<*>>}
  */
 function saveTenant(application) {
-  return doPost('/api/auth/tqAuthTenant', application);
+  return doPost('/api/auth/tqAuthTenant/saveTenant', application);
 }
 
 /**
@@ -66,10 +70,10 @@ function authoriseApplicationToTenant(params) {
   );
 }
 
-function loadAuthorisedApplicationList(tenantId) {
+function loadAuthorisedApplicationList(params) {
   return doGet(
     `/api/auth/tqAuthTenantApplicationRelation/loadTenantRelationApplicationList`,
-    { tenantId }
+    params
   );
 }
 
@@ -81,4 +85,5 @@ export default {
   batchRemoveTenantByPage,
   authoriseApplicationToTenant,
   loadAuthorisedApplicationList,
+  loadTenantList,
 };

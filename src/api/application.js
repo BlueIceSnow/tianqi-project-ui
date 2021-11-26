@@ -66,6 +66,20 @@ function loadApplicationListByCurrentUser() {
   );
 }
 
+/**
+ * 通过用户名加载应用列表
+ * @param username
+ * @returns {Promise<AxiosResponse<*>>}
+ */
+function loadApplicationByUsername(username) {
+  return doGet(
+    `/api/auth/tqAuthTenantApplicationRelation/loadApplicationByUsername`,
+    {
+      username,
+    }
+  );
+}
+
 export default {
   loadAppListByPage,
   updateApplication,
@@ -73,4 +87,5 @@ export default {
   removeApplicationByPage,
   batchRemoveApplicationByPage,
   loadApplicationListByCurrentUser,
+  loadApplicationByUsername,
 };

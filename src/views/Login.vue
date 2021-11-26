@@ -6,9 +6,13 @@
           <div class="topText">系统登录</div>
           <el-form ref="form" :model="formData">
             <el-form-item prop="username">
-              <el-input v-model="formData.username" placeholder="请输入用户名">
-                <template v-slot:prefix
-                  ><i class="icon el-icon-user-solid"></i
+              <el-input
+                v-model="formData.username"
+                placeholder="请输入用户名"
+                @input="loadApplication"
+              >
+                <template #prefix
+                  ><el-icon class="icon" size="20"><user /></el-icon
                 ></template>
               </el-input>
             </el-form-item>
@@ -19,23 +23,17 @@
                 placeholder="请输入密码"
               >
                 <template v-slot:prefix>
-                  <i class="icon el-icon-lock"></i>
+                  <el-icon class="icon" size="20"><key /></el-icon>
                 </template>
               </el-input>
             </el-form-item>
             <el-form-item>
-              <el-select v-model="formData.tenantId" placeholder="租户">
-                <el-option label="普通用户" value="0"></el-option>
-                <el-option label="超级用户" value="1"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-select v-model="formData.appKey" placeholder="应用">
-                <el-option label="普通用户" value="0"></el-option>
+              <el-select v-model="formData.appKey" placeholder="请选择应用">
                 <el-option
-                  label="超级应用"
-                  value="XQI7tnRpyFddsNNfO"
-                ></el-option></el-select
+                  v-for="application in applicationList"
+                  :label="application.name"
+                  :value="application.appKey"
+                ></el-option> </el-select
             ></el-form-item>
             <el-form-item>
               <el-button class="loginBtn" type="primary" @click="onSubmit"
@@ -50,20 +48,29 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useStore } from 'vuex';
+import applicationApis from 'api/application';
+import __ from 'lodash';
+
+const applicationList = ref([]);
 
 const store = useStore();
 const formData = reactive({
   username: '',
   password: '',
   appKey: '',
-  tenantId: '',
 });
 
 function onSubmit() {
   store.dispatch('user/DO_LOGIN', formData);
 }
+
+const loadApplication = __.debounce(function loadApplicationList(username) {
+  applicationApis.loadApplicationByUsername(username).then((res) => {
+    applicationList.value = res.row;
+  });
+}, 1000);
 </script>
 
 <style lang="scss" scoped>
@@ -96,7 +103,7 @@ function onSubmit() {
   padding: 5px;
 }
 .icon {
-  font-size: 18px;
-  line-height: 40px;
+  height: 40px;
+  line-height: 45px;
 }
 </style>

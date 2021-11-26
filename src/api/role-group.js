@@ -57,10 +57,20 @@ function batchRemoveRoleGroupByPage(ids, condition) {
   );
 }
 
+/**
+ * 加载角色组列表
+ * @param params
+ * @returns {Promise<AxiosResponse<*>>}
+ */
+function loadRoleGroupList(params) {
+  return doGet('/api/auth/tqAuthRoleGroup', params);
+}
+
 export default {
   loadRoleGroupListByPage,
   updateRoleGroup,
   saveRoleGroup,
   removeRoleGroupByPage,
   batchRemoveRoleGroupByPage,
+  loadRoleGroupList,
 };

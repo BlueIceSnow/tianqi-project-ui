@@ -10,7 +10,7 @@
       :options="options"
     >
       <template #closeable="{ row }">
-        <span v-html="row.closeable.value ? '是' : '否'"></span>
+        <span v-html="row.closeable ? '是' : '否'"></span>
       </template>
     </tq-table>
   </div>
@@ -19,25 +19,19 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import apis from 'api/role-group';
+import roleApis from 'api/role';
 import TqTable from 'components/TqTable.vue';
+import { useStore } from 'vuex';
 
 const props = defineProps(['appId']);
 const mainName = ref('角色组');
-const condition = reactive({ appId: props.appId });
+const store = useStore();
+const condition = reactive({
+  appId: props.appId,
+  tenantId: store.getters['user/userInfo']?.tenantId,
+});
 
-const options = reactive([
-  {
-    name: '授权',
-    slot: 'authorityRole',
-    method: addRole,
-    icon: 'el-icon-plus',
-    inMore: true,
-  },
-]);
-
-function addRole(row) {
-  console.log(row);
-}
+const options = reactive([]);
 
 const methods = reactive({
   list: apis.loadRoleGroupListByPage,
@@ -71,6 +65,24 @@ const columns = reactive([
     hidden: true,
     type: 'input',
     default: props.appId,
+  },
+  {
+    column: 'includeRoles',
+    label: '角色列表',
+    isShow: false,
+    isEdit: true,
+    default: [],
+    type: 'multiple-select',
+    option: {
+      method: roleApis.loadRoleList,
+      condition: {
+        appId: props.appId,
+        tenantId: store.getters['user/userInfo']?.tenantId,
+      },
+      default: [],
+      key: 'name',
+      value: 'id',
+    },
   },
 ]);
 const rules = reactive({

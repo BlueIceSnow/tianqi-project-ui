@@ -63,6 +63,29 @@ function removeUserByPage(id, condition) {
 function batchRemoveUserByPage(ids, condition) {
   return doDelete(`/api/auth/tqAuthUser/batchRemoveByPage/${ids}`, condition);
 }
+
+function loadUserList(params) {
+  return doGet('/api/auth/tqAuthUser', params);
+}
+
+/**
+ * 授权角色给用户
+ * @param params
+ */
+function authorizeRoleToUser(params) {
+  return doPut('/api/auth/tqAuthUserRoleRelation/authorizeRoleToUser', params);
+}
+
+/**
+ * 加载授权的角色列表
+ * @param params
+ */
+function loadAuthorizedRoleList(params) {
+  return doGet(
+    '/api/auth/tqAuthUserRoleRelation/loadAuthorizedRoleList',
+    params
+  );
+}
 export default {
   doLogin,
   loadMenu,
@@ -71,4 +94,7 @@ export default {
   saveUser,
   removeUserByPage,
   batchRemoveUserByPage,
+  loadUserList,
+  authorizeRoleToUser,
+  loadAuthorizedRoleList,
 };

@@ -2,11 +2,16 @@
   <div class="wrap">
     <div style="padding-bottom: 10px" class="header-wrap">
       <el-button type="primary" @click="saveWinOpen">
-        <el-icon><circle-plus /></el-icon>
+        <el-icon>
+          <circle-plus />
+        </el-icon>
         <span v-html="`新增${props.mainName}`"></span>
       </el-button>
-      <el-button type="primary" @click="batchRemove"
-        ><el-icon><circle-close /></el-icon><span>批量删除</span>
+      <el-button type="primary" @click="batchRemove">
+        <el-icon>
+          <circle-close />
+        </el-icon>
+        <span>批量删除</span>
       </el-button>
 
       <div
@@ -42,7 +47,10 @@
           v-model="componentData.searchCondition[column.column]"
         ></el-switch>
       </div>
-      <el-button type="primary" icon="el-icon-search" @click="searchHandler">
+      <el-button type="primary" @click="searchHandler">
+        <el-icon>
+          <Search />
+        </el-icon>
         搜索
       </el-button>
       <el-button
@@ -78,7 +86,7 @@
             <span
               v-html="
                 selectOptions[column.column]?.find(
-                  (option) => option.id === scope.row.parentId
+                  (option) => option.id === scope.row[column.column]
                 )?.name || '未知'
               "
             ></span>
@@ -165,7 +173,18 @@
           >
             <template v-if="column.formSlot">
               <slot
+                v-if="
+                  column.type !== 'select' && column.type !== 'multiple-select'
+                "
                 :name="column.formSlot"
+                :column="column"
+                :form="componentData.ruleForm"
+              ></slot>
+              <slot
+                v-else
+                :name="column.formSlot"
+                :options="selectOptions[column.column]"
+                :edit="componentData.isEdit"
                 :column="column"
                 :form="componentData.ruleForm"
               ></slot>
@@ -175,8 +194,13 @@
                 v-if="column.type === 'input'"
                 v-model="componentData.ruleForm[column.column]"
               ></el-input>
+              <el-input
+                type="password"
+                v-if="column.type === 'password'"
+                v-model="componentData.ruleForm[column.column]"
+              ></el-input>
               <el-select
-                v-if="column.type === 'select'"
+                v-if="column.type === 'select' && !column.relationColumn"
                 v-model="componentData.ruleForm[column.column]"
                 :placeholder="column.label"
               >
@@ -188,7 +212,30 @@
                 />
               </el-select>
               <el-select
-                v-if="column.type === 'multiple-select'"
+                v-if="column.type === 'select' && column.relationColumn"
+                @change="
+                  (item) => {
+                    column
+                      .loadRelationDataMethod(item)
+                      .then(
+                        (res) => (selectOptions[column.relationColumn] = res)
+                      );
+                  }
+                "
+                v-model="componentData.ruleForm[column.column]"
+                :placeholder="column.label"
+              >
+                <el-option
+                  v-for="(option, index) in selectOptions[column.column]"
+                  :key="index"
+                  :label="option[column.option.key]"
+                  :value="option[column.option.value]"
+                />
+              </el-select>
+              <el-select
+                v-if="
+                  column.type === 'multiple-select' && !column.relationColumn
+                "
                 multiple
                 v-model="componentData.ruleForm[column.column]"
                 :placeholder="column.label"
@@ -224,7 +271,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, render, h, computed, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import __ from 'lodash';
 
 const loading = ref(false);
@@ -361,6 +408,7 @@ function rowSelectedChangeHandle(selection) {
   needDeleteIdArray = [];
   needDeleteIdArray.push(...selection.map((item) => item.id));
 }
+
 /**
  * 查询数据信息
  */
@@ -417,8 +465,6 @@ function edit(row) {
   // 先将表单置为空
   clearForm();
   const rowCopy = __.cloneDeep(row);
-  rowCopy.deleted = rowCopy?.deleted?.value;
-  rowCopy.closeable = rowCopy?.closeable?.value;
   componentData.ruleForm = new Proxy(rowCopy, handler);
 }
 
@@ -499,6 +545,7 @@ function searchHandler() {
   currentPage.value = 1;
   list();
 }
+
 function resetSearchHandler() {
   currentPage.value = 1;
   componentData.searchCondition = new Proxy(
@@ -517,6 +564,7 @@ function resetSearchHandler() {
 :deep(.el-drawer__body) {
   overflow-y: scroll;
 }
+
 .wrap {
   height: 100%;
   overflow-y: auto;
@@ -531,10 +579,12 @@ function resetSearchHandler() {
   align-items: center;
   height: 8%;
 }
+
 .body-wrap {
   height: 80%;
   overflow-y: auto;
 }
+
 .footer-wrap {
   display: flex;
   flex-direction: row;
@@ -543,6 +593,7 @@ function resetSearchHandler() {
   padding: 5px;
   height: calc(12% - 20px);
 }
+
 .condition-wrap {
   padding: 5px;
 }

@@ -9,6 +9,29 @@
       :methods="methods"
       :options="options"
     >
+      <template #mgrId="{ column, options, edit, form }">
+        <template v-if="!edit">
+          <el-input placeholder="姓名" v-model="form['mgr.name']" />
+          <div style="height: 10px"></div>
+          <el-input placeholder="用户名" v-model="form['mgr.username']" />
+          <div style="height: 10px"></div>
+          <el-input placeholder="密码" v-model="form['mgr.password']" />
+        </template>
+        <el-select
+          v-else-if="options && column"
+          v-model="form[column.column]"
+          :placeholder="column.label"
+        >
+          <el-option
+            v-for="(option, index) in options.filter(
+              (item) => item.tenantId === form.id
+            )"
+            :key="index"
+            :label="option[column.option.key]"
+            :value="option[column.option.value]"
+          />
+        </el-select>
+      </template>
     </tq-table>
     <tq-relation-table-dialog
       :dialog-title="'授权应用'"
@@ -31,14 +54,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, provide, onMounted } from 'vue';
+import { reactive, ref } from 'vue';
 import apis from 'api/tenant';
 import applicationApis from 'api/application';
+import userApi from 'api/user';
 import TqTable from 'components/TqTable.vue';
 import TqRelationTableDialog from 'components/TqRelationTableDialog.vue';
 
-const authorityApplicationDialogShow = ref(false);
-provide('isShow', authorityApplicationDialogShow);
 const mainName = ref('租户');
 const condition = reactive({});
 const methods = reactive({
@@ -64,6 +86,32 @@ const columns = reactive([
     search: true,
     default: null,
     type: 'input',
+  },
+  {
+    column: 'state',
+    label: '状态',
+    isShow: true,
+    isEdit: true,
+    search: false,
+    default: true,
+    type: 'switch',
+  },
+  {
+    column: 'mgrId',
+    formSlot: 'mgrId',
+    label: '管理者',
+    isShow: true,
+    isEdit: true,
+    search: true,
+    default: null,
+    type: 'select',
+    option: {
+      method: userApi.loadUserList,
+      condition: { type: 'T' },
+      default: [],
+      key: 'name',
+      value: 'id',
+    },
   },
 ]);
 

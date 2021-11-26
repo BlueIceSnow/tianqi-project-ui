@@ -10,7 +10,7 @@
       :options="options"
     >
       <template #closeable="{ row }">
-        <span v-html="row.closeable.value ? '是' : '否'"></span>
+        <span v-html="row.closeable ? '是' : '否'"></span>
       </template>
     </tq-table>
     <tq-relation-tree-drawer
@@ -19,11 +19,31 @@
       node-key="id"
       label="name"
       main-param-key="roleId"
-      sub-param-key="menuIds"
+      sub-param-key="resIds"
       relation-key="id"
-      :submit-method="apis.authoriseMenuToRole"
-      :load-data-method="() => resApis.loadResByAppId({ appId, type: 'M' })"
+      relation-sub-key="resourceId"
+      :submit-method="apis.authoriseResToRole"
+      :const-query-params="{ appId, type: 'M' }"
+      :const-submit-params="{ tenantId: currentRow?.tenantId }"
+      :load-relation-data-method="apis.loadAuthorisedResByRoleId"
+      :load-data-method="resApis.loadResByAppId"
       ref="tqRelationTreeDrawer"
+    />
+    <tq-relation-tree-drawer
+      drawer-title="授权接口"
+      submit-title="授权"
+      node-key="id"
+      label="name"
+      main-param-key="roleId"
+      sub-param-key="resIds"
+      relation-key="id"
+      relation-sub-key="resourceId"
+      :submit-method="apis.authoriseResToRole"
+      :const-query-params="{ appId, type: 'U' }"
+      :const-submit-params="{ tenantId: currentRow?.tenantId }"
+      :load-relation-data-method="apis.loadAuthorisedResByRoleId"
+      :load-data-method="resApis.loadResByAppId"
+      ref="tqUrlRelationTreeDrawer"
     />
   </div>
 </template>
@@ -32,29 +52,42 @@
 import { reactive, ref } from 'vue';
 import apis from 'api/role';
 import resApis from 'api/resource';
+import tenantApis from 'api/tenant';
 import TqTable from 'components/TqTable.vue';
+import { useStore } from 'vuex';
 import TqRelationTreeDrawer from 'components/TqRelationTreeDrawer.vue';
 
 const props = defineProps(['appId']);
+const store = useStore();
 
 const mainName = ref('角色');
 const condition = reactive({ appId: props.appId });
 
 const tqRelationTreeDrawer = ref();
-
+const tqUrlRelationTreeDrawer = ref();
+const currentRow = ref(null);
 const options = reactive([
   {
-    name: '授权',
+    name: '授权菜单',
     slot: 'authorityRole',
-    method: (row) => tqRelationTreeDrawer.value.openDrawer(row),
-    icon: 'el-icon-plus',
+    method: (row) => {
+      currentRow.value = row;
+      tqRelationTreeDrawer.value.openDrawer(row);
+    },
+    icon: 'Plus',
+    inMore: true,
+  },
+  {
+    name: '授权接口',
+    slot: 'authorityUrl',
+    method: (row) => {
+      currentRow.value = row;
+      tqUrlRelationTreeDrawer.value.openDrawer(row);
+    },
+    icon: 'Plus',
     inMore: true,
   },
 ]);
-
-function addRole(row) {
-  console.log(row);
-}
 
 const methods = reactive({
   list: apis.loadRoleListByPage,
@@ -98,7 +131,10 @@ const columns = reactive([
     type: 'multiple-select',
     option: {
       method: apis.loadRoleList,
-      condition: {},
+      condition: {
+        appId: props.appId,
+        tenantId: store.getters['user/userInfo']?.tenantId,
+      },
       default: [],
       key: 'name',
       value: 'id',
@@ -114,6 +150,25 @@ const columns = reactive([
     default: props.appId,
   },
 ]);
+if (store.getters['user/userInfo']?.tenantId === 1) {
+  columns.push({
+    column: 'tenantId',
+    label: '所属租户',
+    isShow: true,
+    isEdit: true,
+    search: true,
+    default: null,
+    type: 'select',
+    option: {
+      method: tenantApis.loadTenantList,
+      condition: {},
+      default: [],
+      key: 'name',
+      value: 'id',
+    },
+  });
+}
+
 const rules = reactive({
   name: [
     {

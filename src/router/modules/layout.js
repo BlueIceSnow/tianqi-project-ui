@@ -6,7 +6,7 @@ export default [
     path: '/',
     name: 'index',
     component: Layout,
-    redirect: 'dashboard',
+    redirect: '/dashboard',
     meta: {
       url: '/',
       title: '首页',

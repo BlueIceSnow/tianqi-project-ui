@@ -8,7 +8,7 @@
       :methods="methods"
     >
       <template #closeable="{ row }">
-        <span v-html="row.closeable.value ? '是' : '否'"></span>
+        <span v-html="row.closeable ? '是' : '否'"></span>
       </template>
       <template #testin="{ column, form }">
         <el-input v-model="form[column.column]"></el-input>

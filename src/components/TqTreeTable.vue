@@ -33,7 +33,7 @@
         <span
           v-html="
             selectOptions[column.column]?.find(
-              (option) => option.id === scope.row.parentId
+              (option) => option.id === scope.row[column.column]
             )?.name || '未知'
           "
         ></span>
@@ -112,6 +112,11 @@
           <template v-else>
             <el-input
               v-if="column.type === 'input'"
+              v-model="componentData.ruleForm[column.column]"
+            ></el-input>
+            <el-input
+              type="password"
+              v-if="column.type === 'password'"
               v-model="componentData.ruleForm[column.column]"
             ></el-input>
             <el-select
@@ -314,8 +319,6 @@ function edit(row) {
   // 先将表单置为空
   clearForm();
   const rowCopy = __.cloneDeep(row);
-  rowCopy.deleted = rowCopy?.deleted?.value;
-  rowCopy.closeable = rowCopy?.closeable?.value;
   componentData.ruleForm = new Proxy(rowCopy, handler);
 }
 
@@ -386,12 +389,13 @@ function buildTree(list, parentId) {
 
 .menu {
   width: 100%;
+  padding-bottom: 10px;
   overflow-x: auto;
   display: flex;
   flex-direction: row;
   justify-content: start;
   align-items: center;
-  height: 8%;
+  height: calc(8% - 10px);
 }
 
 :deep(.el-drawer__body) {

@@ -31,7 +31,7 @@ request.interceptors.response.use(
         return Promise.reject(new Error(status.msg || 'Error'));
       }
       if (codeStr.indexOf('2') === 0) {
-        ElMessage.success(status.msg);
+        // ElMessage.success(status.msg);
         return res.data;
       }
 

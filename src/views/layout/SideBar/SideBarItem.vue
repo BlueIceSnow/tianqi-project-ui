@@ -20,7 +20,7 @@
       <el-menu-item
         v-if="!menu.extField.isGroup"
         :index="menu.id.toString()"
-        @click="clickItem(menu.name, menu.url, menu.closeable.value, menu.id)"
+        @click="clickItem(menu.name, menu.url, menu.closeable, menu.id)"
       >
         <el-icon><component :is="menu.icon"></component></el-icon>
         <template #title>{{ menu.name }}</template></el-menu-item

@@ -80,7 +80,7 @@ function buildTree(menuList, routerList, pid) {
             url: menuList[i].url,
             title: menuList[i].name,
             index: menuList[i].id,
-            closeable: menuList[i].closeable.value,
+            closeable: menuList[i].closeable,
           },
           children,
         };
