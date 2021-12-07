@@ -1,16 +1,15 @@
 <template>
   <div>
-    <tq-application-tab>
-      <template #default="{ application }">
-        <RoleGroup :appId="application.id"></RoleGroup>
-      </template>
-    </tq-application-tab>
+    <RoleGroup :appId="appId"></RoleGroup>
   </div>
 </template>
 
 <script setup>
-import TqApplicationTab from 'components/TqApplicationTab.vue';
+import { useStore } from 'vuex';
 import RoleGroup from './RoleGroup.vue';
+
+const store = useStore();
+const appId = store.getters['user/currentApplication'].id;
 </script>
 
 <style scoped lang="scss"></style>

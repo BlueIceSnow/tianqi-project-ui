@@ -48,6 +48,7 @@
               <el-dropdown-item command="logout">组织信息</el-dropdown-item>
               <el-dropdown-item command="logout">更换头像</el-dropdown-item>
               <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item command="changeApp">切换应用</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown></el-space
@@ -68,11 +69,29 @@
       </el-space>
     </div>
   </div>
+  <el-dialog v-model="selectAppDialog" title="选择应用" width="30%">
+    <el-select v-model="appId" placeholder="请选择应用" style="width: 100%">
+      <el-option
+        v-for="item in applicationList"
+        :key="item.id"
+        :label="item.name"
+        :value="item.id"
+      >
+      </el-option>
+    </el-select>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="selectAppDialog = false">取消</el-button>
+        <el-button type="primary" @click="selectAppHandle">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import router from '../../../router';
 
 const store = useStore();
 const isOpen = computed(() => store.getters['app/showSideBar']);
@@ -80,6 +99,15 @@ const isFullScreen = computed(() => store.getters['app/fullScreen']);
 const hasFullScreen = computed(() => store.getters['app/size'] === 'pc');
 const matchedRouters = store.getters['app/matchedRouters'];
 let instance;
+const applicationList = store.getters['user/applicationList'];
+const appId = ref(store.getters['user/currentApplication'].id);
+watch(
+  () => store.getters['user/currentApplication'].id,
+  (newVal) => {
+    appId.value = store.getters['user/currentApplication'].id;
+  }
+);
+const selectAppDialog = ref(false);
 onMounted(() => {
   instance = getCurrentInstance();
 });
@@ -91,7 +119,25 @@ function changeSideBar() {
  * 处理下拉菜单点击事件
  * @param command
  */
-function handleCommand(command) {}
+function handleCommand(command) {
+  switch (command) {
+    case 'changeApp':
+      selectAppDialog.value = true;
+      break;
+    default:
+  }
+}
+
+function selectAppHandle() {
+  store.commit(
+    'user/SET_CURRENT_APPLICATION',
+    applicationList.find((item) => item.id === appId.value)
+  );
+  selectAppDialog.value = false;
+  store.commit('app/REMOVE_ALL');
+  router.push('/');
+  window.location.refresh();
+}
 
 /**
  * 全屏

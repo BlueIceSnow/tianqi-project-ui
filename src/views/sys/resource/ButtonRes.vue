@@ -108,7 +108,7 @@ const columns = reactive([
     isEdit: false,
     hidden: true,
     type: 'input',
-    default: 1,
+    default: props.appId,
   },
   {
     column: 'extField.isLink',

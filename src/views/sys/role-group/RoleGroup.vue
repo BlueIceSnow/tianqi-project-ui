@@ -22,6 +22,7 @@ import apis from 'api/role-group';
 import roleApis from 'api/role';
 import TqTable from 'components/TqTable.vue';
 import { useStore } from 'vuex';
+import tenantApis from '../../../api/tenant';
 
 const props = defineProps(['appId']);
 const mainName = ref('角色组');
@@ -85,6 +86,24 @@ const columns = reactive([
     },
   },
 ]);
+if (store.getters['user/userInfo']?.tenantId === 1) {
+  columns.push({
+    column: 'tenantId',
+    label: '所属租户',
+    isShow: true,
+    isEdit: true,
+    search: true,
+    default: null,
+    type: 'select',
+    option: {
+      method: tenantApis.loadTenantList,
+      condition: {},
+      default: [],
+      key: 'name',
+      value: 'id',
+    },
+  });
+}
 const rules = reactive({
   name: [
     {

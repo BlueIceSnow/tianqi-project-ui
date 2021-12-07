@@ -20,7 +20,7 @@
       :submit-method="apis.authorizeRoleToUser"
       :load-data-method="roleApis.loadRoleList"
       :load-relation-data-method="apis.loadAuthorizedRoleList"
-      :const-query-params="{ appId }"
+      :const-query-params="{ appId, tenantId: currentRow?.tenantId }"
       :const-submit-params="{ appId }"
       :show-fields="[
         { column: 'id', label: 'ID' },
@@ -143,14 +143,14 @@ if (store.getters['user/userInfo']?.tenantId === 1) {
 }
 
 const appId = ref(1);
-let currentRow = null;
+const currentRow = ref();
 const options = reactive([
   {
     name: '授权角色',
     slot: 'authorityRole',
     method: (row) => {
       selectAppDialog.value = true;
-      currentRow = row;
+      currentRow.value = row;
     },
     icon: 'Plus',
     inMore: true,
@@ -175,7 +175,7 @@ const rules = reactive({
 
 function selectAppHandle() {
   selectAppDialog.value = false;
-  authorizeRole.value.openDialog(currentRow);
+  authorizeRole.value.openDialog(currentRow.value);
 }
 </script>
 

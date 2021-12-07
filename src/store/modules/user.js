@@ -1,4 +1,5 @@
 import userApi from 'api/user';
+import applicationApis from 'api/application';
 import NotFound from 'views/layout/MainContent/404.vue';
 import router from '../../router';
 import constRouterDefine from '../../router/router-component-define';
@@ -8,10 +9,19 @@ export default {
   state: () => ({
     userInfo: {},
     routerList: [],
+    applicationList: [],
+    currentApplication: {},
   }),
   mutations: {
     REFRESH_USER_INFO: (state, payload) => {
       state.userInfo = payload;
+    },
+    SET_APPLICATION_LIST: (state, payload) => {
+      state.applicationList.splice(0, state.applicationList.length);
+      state.applicationList.push(...payload);
+    },
+    SET_CURRENT_APPLICATION: (state, payload) => {
+      state.currentApplication = payload;
     },
   },
   actions: {
@@ -36,7 +46,6 @@ export default {
      * @constructor
      */
     LOAD_USER_MENU: async (context, payload) => {
-      // ElMessage.info('刷新Token');
       const result = await userApi
         .loadMenu()
         .then((res) => {
@@ -46,6 +55,16 @@ export default {
           const menuTree = buildTree(res.row.menus, routerList, -1);
           res.row.menus = menuTree;
           context.commit('REFRESH_USER_INFO', res.row);
+          const appId = res.row.appId;
+          if (Reflect.ownKeys(context.state.currentApplication).length === 0) {
+            context.dispatch('LOAD_APPLICATION_LIST').then((result) => {
+              // 找到当前用户选择的应用
+              context.commit(
+                'SET_CURRENT_APPLICATION',
+                context.state.applicationList.find((item) => item.id === appId)
+              );
+            });
+          }
           return context.state.userInfo;
         })
         .catch((error) => {
@@ -54,10 +73,23 @@ export default {
 
       return result;
     },
+    /**
+     * 加载用户拥有的应用列表
+     * @param context
+     * @returns {Promise<void>}
+     * @constructor
+     */
+    LOAD_APPLICATION_LIST: async (context) => {
+      await applicationApis.loadApplicationListByCurrentUser().then((res) => {
+        context.commit('SET_APPLICATION_LIST', res.row);
+      });
+    },
   },
   getters: {
     userInfo: (state) => state.userInfo,
     routerList: (state) => state.routerList,
+    currentApplication: (state) => state.currentApplication,
+    applicationList: (state) => state.applicationList,
   },
 };
 

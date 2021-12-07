@@ -1,16 +1,15 @@
 <template>
   <div>
-    <tq-application-tab>
-      <template #default="{ application }">
-        <Organization :appId="application.id"></Organization>
-      </template>
-    </tq-application-tab>
+    <Organization :appId="appId"></Organization>
   </div>
 </template>
 
 <script setup>
-import TqApplicationTab from 'components/TqApplicationTab.vue';
+import { useStore } from 'vuex';
 import Organization from './Organization.vue';
+
+const store = useStore();
+const appId = store.getters['user/currentApplication'].id;
 </script>
 
 <style scoped lang="scss"></style>

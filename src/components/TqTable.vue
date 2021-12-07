@@ -28,7 +28,7 @@
         <el-select
           v-if="column.type === 'select'"
           :key="index"
-          v-model="componentData.searchCondition.parentId"
+          v-model="componentData.searchCondition[column.column]"
           :placeholder="column.label"
         >
           <el-option
@@ -125,10 +125,27 @@
                     <el-dropdown-item
                       v-for="(option, index) in options"
                       :key="index"
-                      :icon="option.icon"
                       @click="option.method(scope.row)"
-                      ><span v-html="option.name"></span
-                    ></el-dropdown-item>
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: row;
+                          justify-content: space-between;
+                          align-items: center;
+                        "
+                      >
+                        <div style="height: 30px; line-height: 35px">
+                          <el-icon
+                            ><component :is="option.icon"></component
+                          ></el-icon>
+                        </div>
+                        <div
+                          style="height: 30px; line-height: 30px"
+                          v-html="option.name"
+                        ></div>
+                      </div>
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
