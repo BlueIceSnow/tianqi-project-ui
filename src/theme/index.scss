@@ -1,6 +1,6 @@
 $--colors: (
         "primary": (
-                "base": black,
+                "base": #f2711c,
         ),
         "success": (
                 "base": #21ba45,
@@ -33,3 +33,6 @@ $--colors: (
 
 // You can comment it to hide debug info.
 // @debug $--colors;
+.el-input__prefix-inner, .el-input__suffix-inner {
+        align-items: center !important;
+}

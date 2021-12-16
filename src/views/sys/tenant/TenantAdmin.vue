@@ -13,9 +13,18 @@
         <template v-if="!edit">
           <el-input placeholder="姓名" v-model="form['mgr.name']" />
           <div style="height: 10px"></div>
-          <el-input placeholder="用户名" v-model="form['mgr.username']" />
+          <el-input
+            placeholder="用户名"
+            show-password
+            clearable
+            v-model="form['mgr.username']"
+          />
           <div style="height: 10px"></div>
-          <el-input placeholder="密码" v-model="form['mgr.password']" />
+          <el-input
+            placeholder="密码"
+            v-model="form['mgr.password']"
+            type="password"
+          />
         </template>
         <el-select
           v-else-if="options && column"

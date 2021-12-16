@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import viteESLint from '@ehutch79/vite-eslint';
 import { viteMockServe } from 'vite-plugin-mock';
+import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
@@ -48,12 +49,11 @@ export default defineConfig({
       mockPath: 'src/mock',
       supportTs: false,
     }),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
     Components({
-      resolvers: [
-        ElementPlusResolver({
-          importStyle: 'sass',
-        }),
-      ],
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
     }),
   ],
 });

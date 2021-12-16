@@ -22,7 +22,7 @@
                 show-password
                 placeholder="请输入密码"
               >
-                <template v-slot:prefix>
+                <template #prefix>
                   <el-icon class="icon" size="20"><key /></el-icon>
                 </template>
               </el-input>

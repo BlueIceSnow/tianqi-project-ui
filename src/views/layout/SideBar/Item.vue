@@ -1,8 +1,8 @@
 <template>
-  <div ref="root">
-    <el-icon><component :is="props.icon"></component></el-icon>
-    <span v-html="props.title"></span>
-  </div>
+  <!--  <div ref="root">-->
+  <el-icon><component :is="props.icon"></component></el-icon>
+  <span v-html="props.title"></span>
+  <!--  </div>-->
 </template>
 
 <script setup>
