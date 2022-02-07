@@ -59,7 +59,7 @@ const columns = reactive([
     type: 'select',
     option: {
       method: apis.loadResByAppId,
-      condition: { type: 'B', appId: 1 },
+      condition: { type: 'B', appId: props.appId },
       default: [{ id: -1, name: '顶级按钮' }],
       key: 'name',
       value: 'id',

@@ -122,6 +122,7 @@ function changeSideBar() {
 function handleCommand(command) {
   switch (command) {
     case 'changeApp':
+      store.dispatch('user/LOAD_APPLICATION_LIST');
       selectAppDialog.value = true;
       break;
     default:

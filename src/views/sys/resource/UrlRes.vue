@@ -58,7 +58,7 @@ const columns = reactive([
     type: 'select',
     option: {
       method: apis.loadResByAppId,
-      condition: { type: 'U', appId: 1 },
+      condition: { type: 'U', appId: props.appId },
       default: [{ id: -1, name: '顶级接口' }],
       key: 'name',
       value: 'id',

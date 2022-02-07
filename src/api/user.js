@@ -14,7 +14,7 @@ function doLogin(data) {
  * @returns {Promise<AxiosResponse<*>>}
  */
 function loadMenu() {
-  return doPost(`/api/auth/tqAuthResource/loadMenu`);
+  return doGet(`/api/auth/tqAuthResource/loadMenu`);
 }
 
 /**
