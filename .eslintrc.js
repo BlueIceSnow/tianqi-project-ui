@@ -33,5 +33,6 @@ module.exports = {
     'vue/no-v-model-argument': 'off',
     'no-nested-ternary': 'off',
     'vue/valid-v-for': 'off',
+    'vue/multi-word-component-names': 'off',
   },
 };

@@ -137,7 +137,7 @@ function selectAppHandle() {
   selectAppDialog.value = false;
   store.commit('app/REMOVE_ALL');
   router.push('/');
-  window.location.refresh();
+  store.commit('app/REMOVE_ALL');
 }
 
 /**
